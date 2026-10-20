@@ -1,0 +1,83 @@
+/* Mirrors StackedBarChart: Recharts plot area, axes and the legend below. */
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.chart {
+  display: grid;
+  grid-template-columns: var(--y-axis-width) 1fr;
+  grid-template-rows: 1fr var(--x-axis-height);
+  height: var(--chart-height);
+  padding-top: var(--chart-top);
+}
+
+.yAxis,
+.plot {
+  position: relative;
+}
+
+/* Tick labels ("400") sit right-aligned, centred on their gridline. */
+.yTick {
+  position: absolute;
+  right: 8px;
+  width: 20px;
+  height: 8px;
+  transform: translateY(50%);
+}
+
+.plot {
+  display: grid;
+  grid-template-columns: repeat(var(--categories), 1fr);
+  align-items: end;
+}
+
+.gridLine {
+  position: absolute;
+  left: 0;
+  right: 0;
+  border-top: 1px dotted var(--color-grid);
+}
+
+.band {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  height: 100%;
+}
+
+.bar {
+  position: relative;
+  width: var(--bar-width);
+  border-radius: var(--cap-radius) var(--cap-radius) 0 0;
+}
+
+.xAxis {
+  grid-column: 2;
+  display: grid;
+  grid-template-columns: repeat(var(--categories), 1fr);
+  justify-items: center;
+  padding-top: 18px;
+}
+
+/* "Feb 2024" at 12px. */
+.xTick {
+  width: min(52px, 80%);
+  height: 8px;
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px 16px;
+}
+
+/* One line of 13px legend text. */
+.legendItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 16px;
+}

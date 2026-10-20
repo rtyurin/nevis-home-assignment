@@ -5,3 +5,4 @@ export {
   type TreeTableColumn,
   type TreeTableColumnMeta,
 } from './features';
+export { TreeTableSkeleton, type TreeTableSkeletonProps } from './TreeTableSkeleton';

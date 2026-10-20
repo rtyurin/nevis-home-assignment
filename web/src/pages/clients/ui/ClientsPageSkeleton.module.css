@@ -1,47 +1,7 @@
-.stack {
-  display: grid;
-  gap: 20px;
-}
-
-.chart {
+/* "Company  by branch": one 20px line of breadcrumbs. */
+.chartHeader {
   display: flex;
-  align-items: flex-end;
-  gap: 2.5%;
-  height: 340px;
-  padding: 16px 0 32px 44px;
-}
-
-.bar,
-.line {
-  border-radius: 4px;
-  background: var(--color-skeleton);
-  animation: pulse 1.4s ease-in-out infinite;
-}
-
-.bar {
-  flex: 1;
-}
-
-.row {
-  display: flex;
-  justify-content: space-between;
   align-items: center;
-  gap: 24px;
-  height: 56px;
-  padding: 0 24px;
-  border-bottom: 1px solid var(--color-border);
-}
-
-.row:last-child {
-  border-bottom: none;
-}
-
-.line {
-  height: 12px;
-}
-
-@keyframes pulse {
-  50% {
-    opacity: 0.55;
-  }
+  gap: 8px;
+  height: 20px;
 }

@@ -2,6 +2,7 @@ import { useReducedMotion } from 'motion/react';
 import { useId, useState, type CSSProperties, type ReactNode } from 'react';
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis, type BarShapeProps } from 'recharts';
 import { ChartLegend } from './ChartLegend';
+import { BAR_CATEGORY_GAP, CAP_RADIUS, CHART_HEIGHT, CHART_TOP_MARGIN, X_AXIS_HEIGHT, Y_AXIS_WIDTH } from './layout';
 import { barPath, niceScale, toChartRows, type ChartRow } from './toChartRows';
 import type { ChartCategory, ChartSeries } from './types';
 import styles from './StackedBarChart.module.css';
@@ -20,10 +21,8 @@ export interface StackedBarChartProps {
   'aria-describedby'?: string;
 }
 
-const CAP_RADIUS = 4;
 /** Surface-colored gap between stacked segments. */
 const SEGMENT_GAP = 1;
-const Y_AXIS_WIDTH = 44;
 /** Below this band width, x labels switch to short form and thin out. */
 const FULL_LABEL_MIN_BAND = 76;
 
@@ -34,7 +33,7 @@ export function StackedBarChart({
   categories,
   series,
   totals,
-  height = 400,
+  height = CHART_HEIGHT,
   formatValue = defaultFormat,
   renderTooltipFooter,
   ...ariaProps
@@ -56,8 +55,8 @@ export function StackedBarChart({
       >
         <BarChart
           data={rows}
-          margin={{ top: 12, right: 0, bottom: 0, left: 0 }}
-          barCategoryGap="22%"
+          margin={{ top: CHART_TOP_MARGIN, right: 0, bottom: 0, left: 0 }}
+          barCategoryGap={`${BAR_CATEGORY_GAP * 100}%`}
           accessibilityLayer
         >
           {hatchColor && (
@@ -73,6 +72,7 @@ export function StackedBarChart({
             // Short labels when narrow. (Not via tickFormatter's index: once ticks are thinned
             // out, that index counts visible ticks, not categories.)
             dataKey={narrow ? 'shortLabel' : 'label'}
+            height={X_AXIS_HEIGHT}
             tickLine={false}
             axisLine={false}
             tickMargin={12}

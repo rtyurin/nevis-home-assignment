@@ -1,0 +1,13 @@
+.skeleton {
+  display: block;
+  flex: none;
+  border-radius: 4px;
+  background: var(--color-skeleton);
+  animation: pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  50% {
+    opacity: 0.55;
+  }
+}
