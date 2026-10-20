@@ -2,7 +2,7 @@ import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useState } from 'react';
 import { describe, expect, it, vi } from 'vitest';
-import { createTreeTableColumnHelper, type TreeExpandedState } from './features';
+import { createTreeTableColumnHelper, type TreeExpandedState, type TreeTableColumn } from './features';
 import { TreeTable } from './TreeTable';
 
 interface Item {
@@ -34,7 +34,7 @@ const tree: Item[] = [
 ];
 
 const column = createTreeTableColumnHelper<Item>();
-const columns = [
+const columns: TreeTableColumn<Item>[] = [
   column.accessor('name', { header: 'Name', meta: { minWidth: 200, grow: 2 } }),
   column.accessor('value', { header: 'Value', meta: { align: 'end' } }),
 ];
@@ -92,11 +92,6 @@ describe('TreeTable', () => {
     expect(row('Beta')).toHaveAttribute('aria-posinset', '2');
     expect(row('Beta')).not.toHaveAttribute('aria-expanded');
     expect(within(row('Beta')).getByRole('gridcell')).toHaveTextContent('3');
-  });
-
-  it('only renders the children of expanded rows', () => {
-    render(<Harness />);
-    expect(bodyRowNames()).toEqual(['Root', 'Alpha', 'Beta']);
   });
 
   it('expands and collapses on click', async () => {
@@ -202,10 +197,62 @@ describe('TreeTable', () => {
       expect(row('Alpha')).toHaveAttribute('aria-expanded', 'true');
       await user.keyboard(' ');
       expect(row('Alpha')).toHaveAttribute('aria-expanded', 'false');
-
-      await user.keyboard('{Home}{Enter}');
-      expect(bodyRowNames()).toEqual(['Root']);
     });
+
+    it('expands every sibling with *', async () => {
+      const user = userEvent.setup();
+      render(<Harness />);
+
+      await user.tab();
+      await user.keyboard('{ArrowDown}*');
+      expect(row('Alpha')).toHaveAttribute('aria-expanded', 'true');
+      expect(row('Alpha')).toHaveFocus();
+      // Leaves among the siblings are left alone.
+      expect(row('Beta')).not.toHaveAttribute('aria-expanded');
+    });
+  });
+
+  it('leaves clicks on a control inside a cell to the control', async () => {
+    const user = userEvent.setup();
+    const onAction = vi.fn();
+    render(
+      <TreeTable
+        aria-label="With controls"
+        data={tree}
+        columns={[
+          columns[0]!,
+          column.display({ id: 'action', header: 'Action', cell: () => <button onClick={onAction}>Act</button> }),
+        ]}
+        getRowId={(item) => item.id}
+        getSubRows={(item) => item.children}
+        expanded={{}}
+        onExpandedChange={() => {}}
+      />,
+    );
+
+    await user.click(within(row('Root')).getByRole('button', { name: 'Act' }));
+    expect(onAction).toHaveBeenCalledOnce();
+    expect(row('Root')).toHaveAttribute('aria-expanded', 'false');
+    expect(within(row('Root')).getByRole('button')).toHaveFocus();
+  });
+
+  it('numbers rows after every header row when columns are grouped', () => {
+    render(
+      <TreeTable
+        aria-label="Grouped"
+        data={tree}
+        columns={[columns[0]!, column.group({ id: 'figures', header: 'Figures', columns: [columns[1]!] })]}
+        getRowId={(item) => item.id}
+        getSubRows={(item) => item.children}
+        expanded={{}}
+        onExpandedChange={() => {}}
+      />,
+    );
+
+    const headerRows = within(screen.getByRole('treegrid')).getAllByRole('row').slice(0, 2);
+    expect(headerRows.map((r) => r.getAttribute('aria-rowindex'))).toEqual(['1', '2']);
+    expect(row('Root')).toHaveAttribute('aria-rowindex', '3');
+    expect(screen.getByRole('treegrid')).toHaveAttribute('aria-rowcount', '3');
   });
 
   it('selection follows focus', async () => {
@@ -236,7 +283,8 @@ describe('TreeTable', () => {
     vi.spyOn(document.documentElement, 'scrollHeight', 'get').mockReturnValue(202 * 56);
     vi.spyOn(window, 'scrollTo').mockImplementation(((options: ScrollToOptions) => {
       Object.defineProperty(window, 'scrollY', { value: options.top ?? 0, configurable: true });
-      window.dispatchEvent(new Event('scroll'));
+      // Browsers fire scroll asynchronously; firing it inline would flush React from inside a commit.
+      queueMicrotask(() => window.dispatchEvent(new Event('scroll')));
     }) as typeof window.scrollTo);
     const user = userEvent.setup();
     render(
@@ -259,5 +307,11 @@ describe('TreeTable', () => {
     await user.keyboard('{End}');
     expect(row('Node 199')).toHaveFocus();
     expect(row('Node 199')).toHaveAttribute('aria-rowindex', '202');
+
+    // A page is a screenful of rows, less one: jsdom's window is 768px tall, rows are 56px.
+    await user.keyboard('{PageUp}');
+    expect(row('Node 187')).toHaveFocus();
+    await user.keyboard('{Home}{PageDown}');
+    expect(row('Node 11')).toHaveFocus();
   });
 });

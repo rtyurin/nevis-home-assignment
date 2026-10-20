@@ -4,6 +4,7 @@ import {
   rowExpandingFeature,
   tableFeatures,
   type ColumnDef,
+  type Row,
   type RowData,
 } from '@tanstack/react-table';
 
@@ -23,6 +24,8 @@ export const treeTableFeatures = tableFeatures({
 });
 
 export type TreeTableFeatures = typeof treeTableFeatures;
+
+export type TreeRow<TData extends RowData> = Row<TreeTableFeatures, TData>;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any -- columns of different value types share one array, as in TanStack's own examples
 export type TreeTableColumn<TData extends RowData> = ColumnDef<TreeTableFeatures, TData, any>;

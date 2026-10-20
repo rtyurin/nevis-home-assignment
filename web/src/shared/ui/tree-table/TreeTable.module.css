@@ -21,7 +21,7 @@
 .treeHeader {
   display: flex;
   align-items: center;
-  height: 56px;
+  height: var(--tree-table-row-height);
   padding: 0 12px;
   color: var(--color-text-secondary);
   white-space: nowrap;
@@ -48,6 +48,8 @@
 
 .body {
   position: relative;
+  /* Rows stack by depth (negative z-index); keep that from reaching past the body. */
+  isolation: isolate;
   overflow: clip;
 }
 
@@ -114,8 +116,8 @@
   flex: none;
   align-items: center;
   justify-content: center;
-  width: 20px;
-  height: 20px;
+  width: 16px;
+  height: 16px;
   color: var(--color-text);
 }
 

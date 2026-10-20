@@ -9,7 +9,6 @@ export async function fetchClients(signal?: AbortSignal): Promise<ClientsData> {
   return toClientsData(await getJson(apiUrl('/api/clients'), clientsResponseSchema, signal));
 }
 
-/** The client tree. Use with `useSuspenseQuery` / `useQuery` / `prefetchQuery`. */
 export const clientsQueryOptions = () =>
   queryOptions({
     queryKey: ['clients'] as const,

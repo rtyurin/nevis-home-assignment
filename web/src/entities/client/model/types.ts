@@ -1,10 +1,5 @@
 export type ClientNodeKind = 'company' | 'branch' | 'employee' | 'channel';
 
-/**
- * The client tree normalised to one shape. The API nests levels under different
- * keys (`branches`, `employees`, `channels`) and omits them when empty; the UI
- * only cares about `children`, with `kind` recording the level.
- */
 export interface ClientNode {
   id: string;
   name: string;
