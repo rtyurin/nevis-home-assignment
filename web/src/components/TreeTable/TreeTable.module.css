@@ -1,0 +1,142 @@
+.scroller {
+  overflow-x: auto;
+  border-radius: inherit;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 15px;
+  line-height: 20px;
+  font-variant-numeric: tabular-nums;
+}
+
+.header,
+.nameHeader {
+  height: 56px;
+  padding: 0 12px;
+  font-weight: 400;
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.nameHeader {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  min-width: 220px;
+  background: var(--color-surface);
+  text-align: start;
+}
+
+.header[data-align='end'],
+.cell[data-align='end'] {
+  text-align: end;
+}
+
+.row {
+  cursor: default;
+  outline: none;
+}
+
+.row[aria-expanded] {
+  cursor: pointer;
+}
+
+.row > * {
+  height: 56px;
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  transition: background-color 120ms ease;
+}
+
+.row:last-child > * {
+  border-bottom: none;
+}
+
+.row:hover > * {
+  background: var(--color-row-hover);
+}
+
+.row[aria-selected='true'] > * {
+  background: var(--color-row-selected);
+}
+
+/* Focus ring drawn on the cells so it survives the sticky first column. */
+.row:focus-visible > * {
+  box-shadow:
+    inset 0 2px 0 var(--color-focus),
+    inset 0 -2px 0 var(--color-focus);
+}
+.row:focus-visible > :first-child {
+  box-shadow:
+    inset 2px 2px 0 var(--color-focus),
+    inset 0 -2px 0 var(--color-focus);
+}
+.row:focus-visible > :last-child {
+  box-shadow:
+    inset -2px 2px 0 var(--color-focus),
+    inset 0 -2px 0 var(--color-focus);
+}
+
+.nameCell {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  padding: 0 16px 0 calc(16px + (var(--tree-level) - 1) * 28px);
+  font-weight: 400;
+  text-align: start;
+  white-space: nowrap;
+}
+
+.nameInner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.toggle {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  color: var(--color-text);
+  transition: transform 150ms ease;
+}
+
+.toggle[data-expanded='true'] {
+  transform: rotate(90deg);
+}
+
+.cell {
+  padding: 0 12px;
+  white-space: nowrap;
+}
+
+.cell:last-child,
+.header:last-child {
+  padding-right: 24px;
+}
+
+@media (max-width: 640px) {
+  .table {
+    font-size: 14px;
+  }
+  .nameHeader {
+    min-width: 0;
+  }
+  .nameCell {
+    max-width: 55vw;
+    padding-left: calc(8px + (var(--tree-level) - 1) * 16px);
+    padding-right: 12px;
+  }
+  .nameInner {
+    overflow: hidden;
+  }
+  .nameHeader {
+    padding-left: 8px;
+  }
+}

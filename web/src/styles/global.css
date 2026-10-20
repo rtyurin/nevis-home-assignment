@@ -1,0 +1,89 @@
+:root {
+  --font-sans: 'Inter Variable', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  --color-page: #f7f5f0;
+  --color-surface: #ffffff;
+  --color-text: #1b1b1b;
+  --color-text-secondary: #6b6964;
+  --color-text-muted: #8a8780;
+  --color-border: #ecebe7;
+  --color-grid: #d9d7d1;
+  --color-row-hover: #f7f6f4;
+  --color-row-selected: #efeeeb;
+  --color-skeleton: #eeece7;
+  --color-focus: #5b4bb7;
+  --color-danger: #a3323c;
+
+  /* Categorical chart slots, in fixed order. 1–3 are the design's channel colors. */
+  --series-1: #af9ef0;
+  --series-2: #f2bdb1;
+  --series-3: #a35f6c;
+  --series-4: #5b4bb7;
+  --series-5: #c98a2b;
+  --series-unattributed: #d9d6cf;
+
+  --radius-card: 12px;
+  --space-page: 24px;
+
+  color-scheme: light;
+  font-family: var(--font-sans);
+  color: var(--color-text);
+  background: var(--color-page);
+  -webkit-font-smoothing: antialiased;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  background: var(--color-page);
+}
+
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (max-width: 640px) {
+  :root {
+    --space-page: 16px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

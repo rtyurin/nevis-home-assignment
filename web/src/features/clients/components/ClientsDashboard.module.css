@@ -1,0 +1,31 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 32px var(--space-page) 48px;
+}
+
+.title {
+  font-size: 34px;
+  line-height: 40px;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+
+.stack {
+  display: grid;
+  gap: 20px;
+}
+
+@media (max-width: 640px) {
+  .page {
+    padding-top: 20px;
+    gap: 16px;
+  }
+  .title {
+    font-size: 28px;
+    line-height: 34px;
+  }
+}
