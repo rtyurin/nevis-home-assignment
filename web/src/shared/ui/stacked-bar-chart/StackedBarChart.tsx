@@ -2,7 +2,15 @@ import { useReducedMotion } from 'motion/react';
 import { useId, useState, type CSSProperties, type ReactNode } from 'react';
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis, type BarShapeProps } from 'recharts';
 import { ChartLegend } from './ChartLegend';
-import { BAR_CATEGORY_GAP, CAP_RADIUS, CHART_HEIGHT, CHART_TOP_MARGIN, X_AXIS_HEIGHT, Y_AXIS_WIDTH } from './layout';
+import {
+  BAR_MIN_SHARE,
+  barWidth,
+  CAP_RADIUS,
+  CHART_HEIGHT,
+  CHART_TOP_MARGIN,
+  X_AXIS_HEIGHT,
+  Y_AXIS_WIDTH,
+} from './layout';
 import { barPath, niceScale, toChartRows, type ChartRow } from './toChartRows';
 import type { ChartCategory, ChartSeries } from './types';
 import styles from './StackedBarChart.module.css';
@@ -21,8 +29,6 @@ export interface StackedBarChartProps {
   'aria-describedby'?: string;
 }
 
-/** Surface-colored gap between stacked segments. */
-const SEGMENT_GAP = 1;
 /** Below this band width, x labels switch to short form and thin out. */
 const FULL_LABEL_MIN_BAND = 76;
 
@@ -42,7 +48,8 @@ export function StackedBarChart({
   const scale = niceScale(Math.max(0, ...rows.map((row) => Math.max(row.total, sumOf(row.values)))));
   const patternId = `hatch-${useId().replace(/:/g, '')}`;
   const reduceMotion = useReducedMotion() ?? false;
-  const [narrow, setNarrow] = useState(false);
+  const [band, setBand] = useState<number>();
+  const narrow = band !== undefined && band < FULL_LABEL_MIN_BAND;
   const hatchColor = series.find((s) => s.pattern === 'hatch')?.color;
 
   return (
@@ -51,12 +58,14 @@ export function StackedBarChart({
         width="100%"
         height={height}
         initialDimension={{ width: 720, height }}
-        onResize={(width) => setNarrow((width - Y_AXIS_WIDTH) / Math.max(categories.length, 1) < FULL_LABEL_MIN_BAND)}
+        onResize={(width) => setBand((width - Y_AXIS_WIDTH) / Math.max(categories.length, 1))}
       >
         <BarChart
           data={rows}
           margin={{ top: CHART_TOP_MARGIN, right: 0, bottom: 0, left: 0 }}
-          barCategoryGap={`${BAR_CATEGORY_GAP * 100}%`}
+          barSize={band === undefined ? undefined : barWidth(band)}
+          // Until measured: the narrow-plot proportions.
+          barCategoryGap={`${((1 - BAR_MIN_SHARE) / 2) * 100}%`}
           accessibilityLayer
         >
           {hatchColor && (
@@ -130,10 +139,9 @@ function Segment({ x, y, width, height, payload, seriesId, fill }: BarShapeProps
   const row = payload as ChartRow;
   if (!(height > 0)) return <g />;
   const isTop = row.topSeriesId === seriesId;
-  const gap = isTop || height <= SEGMENT_GAP * 2 ? 0 : SEGMENT_GAP;
   return (
     <path
-      d={barPath(x, y + gap, width, height - gap, isTop ? CAP_RADIUS : 0)}
+      d={barPath(x, y, width, height, isTop ? CAP_RADIUS : 0)}
       style={{ fill }}
       data-series={seriesId}
       data-category={row.id}

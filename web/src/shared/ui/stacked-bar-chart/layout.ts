@@ -4,6 +4,15 @@ export const CHART_TOP_MARGIN = 12;
 export const Y_AXIS_WIDTH = 44;
 /** Recharts' default XAxis height. */
 export const X_AXIS_HEIGHT = 30;
-/** Share of each category band left empty on either side of its bar. */
-export const BAR_CATEGORY_GAP = 0.22;
+/** Widest a bar gets, as in the design. */
+export const BAR_MAX_WIDTH = 87.5;
+/** Space kept on either side of a bar: 24px between bars, 12px at the plot's edges. */
+export const BAR_INSET = 12;
+/** On narrow plots the insets give way, and a bar keeps this share of its band. */
+export const BAR_MIN_SHARE = 0.56;
 export const CAP_RADIUS = 4;
+
+/** Width of a bar in a category band of the given width. */
+export function barWidth(band: number): number {
+  return Math.min(BAR_MAX_WIDTH, Math.max(band - 2 * BAR_INSET, band * BAR_MIN_SHARE));
+}

@@ -1,6 +1,15 @@
 import type { CSSProperties } from 'react';
 import { Skeleton } from '@/shared/ui/skeleton';
-import { BAR_CATEGORY_GAP, CAP_RADIUS, CHART_HEIGHT, CHART_TOP_MARGIN, X_AXIS_HEIGHT, Y_AXIS_WIDTH } from './layout';
+import {
+  BAR_INSET,
+  BAR_MAX_WIDTH,
+  BAR_MIN_SHARE,
+  CAP_RADIUS,
+  CHART_HEIGHT,
+  CHART_TOP_MARGIN,
+  X_AXIS_HEIGHT,
+  Y_AXIS_WIDTH,
+} from './layout';
 import styles from './StackedBarChartSkeleton.module.css';
 
 export interface StackedBarChartSkeletonProps {
@@ -21,7 +30,9 @@ export function StackedBarChartSkeleton({ bars, seriesCount, height = CHART_HEIG
     '--chart-top': `${CHART_TOP_MARGIN}px`,
     '--y-axis-width': `${Y_AXIS_WIDTH}px`,
     '--x-axis-height': `${X_AXIS_HEIGHT}px`,
-    '--bar-width': `${(1 - 2 * BAR_CATEGORY_GAP) * 100}%`,
+    '--bar-max-width': `${BAR_MAX_WIDTH}px`,
+    '--bar-inset': `${BAR_INSET}px`,
+    '--bar-min-share': `${BAR_MIN_SHARE * 100}%`,
     '--cap-radius': `${CAP_RADIUS}px`,
     '--categories': bars.length,
   } as CSSProperties;

@@ -1,6 +1,6 @@
 .panel {
   min-width: 0;
-  padding: 24px;
+  padding: 24px 12px;
   border-radius: var(--radius-card);
   background: var(--color-surface);
 }
