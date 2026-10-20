@@ -1,0 +1,125 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.root :global(.recharts-cartesian-grid-horizontal line) {
+  stroke: var(--color-grid);
+  stroke-dasharray: 1 4;
+  stroke-linecap: round;
+}
+
+.root :global(.recharts-cartesian-axis-tick-value) {
+  font-size: 12px;
+  fill: var(--color-text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+.root :global(.recharts-surface:focus-visible) {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+
+.root :global(.recharts-wrapper) {
+  outline: none;
+}
+
+.hatchLine {
+  stroke: rgb(0 0 0 / 0.16);
+  stroke-width: 2;
+}
+
+.cursor {
+  fill: rgb(0 0 0 / 0.03);
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+.legendItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.swatch {
+  display: inline-block;
+  flex: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  background: var(--swatch-color);
+}
+
+.swatch[data-pattern='hatch'] {
+  background: repeating-linear-gradient(45deg, var(--swatch-color) 0 2px, rgb(0 0 0 / 0.22) 2px 3px);
+}
+
+.tooltip {
+  min-width: 180px;
+  max-width: min(280px, 80%);
+  padding: 10px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface);
+  box-shadow: 0 4px 16px rgb(0 0 0 / 0.08);
+  font-size: 13px;
+  line-height: 18px;
+}
+
+.tooltipTitle {
+  margin-bottom: 6px;
+  font-weight: 600;
+}
+
+.tooltipRows {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+}
+
+.tooltipRow {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.tooltipRow dt {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--color-text-secondary);
+}
+
+.tooltipRow dd {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.tooltipTotal {
+  margin-top: 4px;
+  padding-top: 4px;
+  border-top: 1px solid var(--color-border);
+  font-weight: 600;
+}
+
+.tooltipTotal dt {
+  color: var(--color-text);
+}
+
+.tooltipFooter {
+  margin-top: 6px;
+  color: var(--color-text-secondary);
+  font-size: 12px;
+}

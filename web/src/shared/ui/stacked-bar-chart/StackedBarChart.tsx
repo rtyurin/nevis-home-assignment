@@ -1,0 +1,181 @@
+import { useReducedMotion } from 'motion/react';
+import { useId, useState, type CSSProperties, type ReactNode } from 'react';
+import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis, type BarShapeProps } from 'recharts';
+import { ChartLegend } from './ChartLegend';
+import { barPath, niceScale, toChartRows, type ChartRow } from './toChartRows';
+import type { ChartCategory, ChartSeries } from './types';
+import styles from './StackedBarChart.module.css';
+
+export interface StackedBarChartProps {
+  categories: readonly ChartCategory[];
+  /** Stacked bottom-to-top in array order. */
+  series: readonly ChartSeries[];
+  /** Per-category totals for the tooltip. Defaults to the sum of the stack. */
+  totals?: readonly number[];
+  height?: number;
+  formatValue?: (value: number) => string;
+  /** Extra content at the bottom of the tooltip for a category. */
+  renderTooltipFooter?: (index: number) => ReactNode;
+  'aria-labelledby'?: string;
+  'aria-describedby'?: string;
+}
+
+const CAP_RADIUS = 4;
+/** Surface-colored gap between stacked segments. */
+const SEGMENT_GAP = 1;
+const Y_AXIS_WIDTH = 44;
+/** Below this band width, x labels switch to short form and thin out. */
+const FULL_LABEL_MIN_BAND = 76;
+
+const defaultFormat = (value: number) => value.toLocaleString('en-US');
+
+/** Stacked bar chart over categories (months), built on Recharts. */
+export function StackedBarChart({
+  categories,
+  series,
+  totals,
+  height = 400,
+  formatValue = defaultFormat,
+  renderTooltipFooter,
+  ...ariaProps
+}: StackedBarChartProps) {
+  const rows = toChartRows(categories, series, totals);
+  const scale = niceScale(Math.max(0, ...rows.map((row) => Math.max(row.total, sumOf(row.values)))));
+  const patternId = `hatch-${useId().replace(/:/g, '')}`;
+  const reduceMotion = useReducedMotion() ?? false;
+  const [narrow, setNarrow] = useState(false);
+  const hatchColor = series.find((s) => s.pattern === 'hatch')?.color;
+
+  return (
+    <div className={styles.root} role="figure" {...ariaProps}>
+      <ResponsiveContainer
+        width="100%"
+        height={height}
+        initialDimension={{ width: 720, height }}
+        onResize={(width) => setNarrow((width - Y_AXIS_WIDTH) / Math.max(categories.length, 1) < FULL_LABEL_MIN_BAND)}
+      >
+        <BarChart
+          data={rows}
+          margin={{ top: 12, right: 0, bottom: 0, left: 0 }}
+          barCategoryGap="22%"
+          accessibilityLayer
+        >
+          {hatchColor && (
+            <defs>
+              <pattern id={patternId} width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+                <rect width="6" height="6" style={{ fill: hatchColor }} />
+                <line x1="0" y1="0" x2="0" y2="6" className={styles.hatchLine} />
+              </pattern>
+            </defs>
+          )}
+          <CartesianGrid vertical={false} />
+          <XAxis
+            // Short labels when narrow. (Not via tickFormatter's index: once ticks are thinned
+            // out, that index counts visible ticks, not categories.)
+            dataKey={narrow ? 'shortLabel' : 'label'}
+            tickLine={false}
+            axisLine={false}
+            tickMargin={12}
+            interval={narrow ? 'preserveStartEnd' : 0}
+            minTickGap={8}
+          />
+          <YAxis
+            width={Y_AXIS_WIDTH}
+            tickLine={false}
+            axisLine={false}
+            domain={[0, scale.max]}
+            ticks={scale.ticks}
+            tickFormatter={(value: number) => formatValue(value)}
+          />
+          <Tooltip
+            cursor={{ className: styles.cursor }}
+            isAnimationActive={false}
+            content={({ active, payload }) => {
+              const row = payload?.[0]?.payload as ChartRow | undefined;
+              if (!active || !row) return null;
+              const index = rows.indexOf(row);
+              return (
+                <ChartTooltip
+                  row={row}
+                  series={series}
+                  formatValue={formatValue}
+                  footer={index >= 0 ? renderTooltipFooter?.(index) : null}
+                />
+              );
+            }}
+          />
+          {series.map((s) => (
+            <Bar
+              key={s.id}
+              name={s.name}
+              dataKey={(row: ChartRow) => row.values[s.id] ?? 0}
+              stackId="stack"
+              isAnimationActive={!reduceMotion}
+              animationDuration={400}
+              shape={(props: BarShapeProps) => (
+                <Segment {...props} seriesId={s.id} fill={s.pattern === 'hatch' ? `url(#${patternId})` : s.color} />
+              )}
+            />
+          ))}
+        </BarChart>
+      </ResponsiveContainer>
+      {series.length > 1 && <ChartLegend items={series} />}
+    </div>
+  );
+}
+
+const sumOf = (values: Record<string, number>) => Object.values(values).reduce((a, b) => a + b, 0);
+
+function Segment({ x, y, width, height, payload, seriesId, fill }: BarShapeProps & { seriesId: string; fill: string }) {
+  const row = payload as ChartRow;
+  if (!(height > 0)) return <g />;
+  const isTop = row.topSeriesId === seriesId;
+  const gap = isTop || height <= SEGMENT_GAP * 2 ? 0 : SEGMENT_GAP;
+  return (
+    <path
+      d={barPath(x, y + gap, width, height - gap, isTop ? CAP_RADIUS : 0)}
+      style={{ fill }}
+      data-series={seriesId}
+      data-category={row.id}
+      data-value={row.values[seriesId]}
+      data-top={isTop || undefined}
+    />
+  );
+}
+
+interface ChartTooltipProps {
+  row: ChartRow;
+  series: readonly ChartSeries[];
+  formatValue: (value: number) => string;
+  footer?: ReactNode;
+}
+
+function ChartTooltip({ row, series, formatValue, footer }: ChartTooltipProps) {
+  // Top of the stack first, matching what the eye sees.
+  const visible = series.filter((s) => (row.values[s.id] ?? 0) > 0).reverse();
+  return (
+    <div className={styles.tooltip}>
+      <p className={styles.tooltipTitle}>{row.label}</p>
+      <dl className={styles.tooltipRows}>
+        {visible.map((s) => (
+          <div key={s.id} className={styles.tooltipRow}>
+            <dt>
+              <span
+                className={styles.swatch}
+                data-pattern={s.pattern}
+                style={{ '--swatch-color': s.color } as CSSProperties}
+              />
+              {s.name}
+            </dt>
+            <dd>{formatValue(row.values[s.id] ?? 0)}</dd>
+          </div>
+        ))}
+        <div className={`${styles.tooltipRow} ${styles.tooltipTotal}`}>
+          <dt>Total</dt>
+          <dd>{formatValue(row.total)}</dd>
+        </div>
+      </dl>
+      {footer && <div className={styles.tooltipFooter}>{footer}</div>}
+    </div>
+  );
+}
