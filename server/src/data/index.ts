@@ -1,9 +1,7 @@
 import { readFileSync } from 'node:fs';
 import type { ClientsResponse, CompanyDto } from '../types.js';
 
-const company = JSON.parse(
-  readFileSync(new URL('./clients.json', import.meta.url), 'utf8'),
-) as CompanyDto;
+const company = JSON.parse(readFileSync(new URL('./clients.json', import.meta.url), 'utf8')) as CompanyDto;
 
 /** First month of the series; the design labels the 12 values Feb 2024 – Jan 2025. */
 const START_MONTH = '2024-02';

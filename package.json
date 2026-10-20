@@ -11,14 +11,17 @@
     "build": "npm run build -w web && npm run build -w server",
     "start": "npm run start -w server",
     "test": "npm test -w server && npm test -w web",
-    "lint": "npm run lint -w web",
-    "typecheck": "npm run typecheck -w server && npm run typecheck -w web"
+    "lint": "npm run lint -w web && prettier --check .",
+    "typecheck": "npm run typecheck -w server && npm run typecheck -w web",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "engines": {
     "node": ">=20"
   },
   "devDependencies": {
     "concurrently": "^10.0.6",
+    "prettier": "^3.9.10",
     "typescript": "^6.0.3"
   }
 }
