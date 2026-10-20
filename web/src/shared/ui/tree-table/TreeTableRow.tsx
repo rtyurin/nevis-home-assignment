@@ -13,13 +13,12 @@ interface TreeTableRowProps<TData extends RowData> {
   rowIndex: number;
   setSize: number;
   y: number;
-  /** Where a just-revealed row slides in from. */
   enterFrom: number | undefined;
   canExpand: boolean;
   isExpanded: boolean;
   isTabbable: boolean;
-  /** Undefined when the table has no selection. */
   isSelected: boolean | undefined;
+  isLast: boolean;
 }
 
 export function TreeTableRow<TData extends RowData>({
@@ -33,6 +32,7 @@ export function TreeTableRow<TData extends RowData>({
   isExpanded,
   isTabbable,
   isSelected,
+  isLast,
 }: TreeTableRowProps<TData>) {
   const { id, depth } = row;
   const [treeCell, ...otherCells] = cells;
@@ -61,6 +61,7 @@ export function TreeTableRow<TData extends RowData>({
       aria-expanded={canExpand ? isExpanded : undefined}
       aria-selected={isSelected}
       data-id={id}
+      data-last={isLast || undefined}
     >
       {treeCell && (
         <div role="rowheader" className={styles.treeCell} style={{ '--tree-depth': depth } as CSSProperties}>

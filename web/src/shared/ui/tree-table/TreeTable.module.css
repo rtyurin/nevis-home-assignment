@@ -101,6 +101,24 @@
     inset 0 -2px 0 var(--color-focus);
 }
 
+/*
+ * A rounded container clips the table's bottom corners. Hand its bottom radius down to the
+ * last row's outer cells, so their focus ring and highlight follow the curve instead of
+ * being cut off. In a square container the inherited radius is 0 and nothing changes.
+ */
+.grid,
+.body,
+.row[data-last] {
+  border-bottom-left-radius: inherit;
+  border-bottom-right-radius: inherit;
+}
+.row[data-last] > :first-child {
+  border-bottom-left-radius: inherit;
+}
+.row[data-last] > :last-child {
+  border-bottom-right-radius: inherit;
+}
+
 .treeCell {
   position: sticky;
   left: 0;

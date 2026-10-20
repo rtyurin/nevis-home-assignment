@@ -150,6 +150,7 @@ export function TreeTable<TData extends RowData>({
                   isExpanded={row.getIsExpanded()}
                   isTabbable={row.id === tabbableId}
                   isSelected={onActiveRowChange ? row.id === activeRowId : undefined}
+                  isLast={index === rows.length - 1}
                 />
               );
             })}
