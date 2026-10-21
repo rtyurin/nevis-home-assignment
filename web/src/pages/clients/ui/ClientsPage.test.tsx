@@ -82,7 +82,6 @@ describe('ClientsPage', () => {
     expect(row('Existing clients')).toHaveFocus();
     expect(screen.queryByRole('list', { name: 'Legend' })).toBeNull();
 
-    // The breadcrumb goes back up without collapsing anything.
     await user.click(within(chartScope()).getByRole('button', { name: 'Company' }));
     expect(legend()).toEqual(['Branch 1', 'Branch 2', 'Branch 3', 'Not broken down']);
     expect(row('Existing clients')).toBeInTheDocument();

@@ -1,7 +1,6 @@
 import type { BreakdownSeries } from '@/entities/client';
 import type { ChartSeries } from '@/shared/ui/stacked-bar-chart';
 
-/** Categorical chart slots in fixed order (see --series-* in global.css). 1–3 are the design's channel colors. */
 export const SERIES_COLORS = [
   'var(--series-1)',
   'var(--series-2)',

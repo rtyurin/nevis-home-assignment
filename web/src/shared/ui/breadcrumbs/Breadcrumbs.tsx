@@ -1,37 +1,28 @@
+import type { ComponentProps } from 'react';
 import styles from './Breadcrumbs.module.css';
 
-export interface BreadcrumbItem {
-  id: string;
-  label: string;
-}
-
-export interface BreadcrumbsProps {
-  /** Root first; the last item is the current location. */
-  items: readonly BreadcrumbItem[];
+interface BreadcrumbsProps extends Omit<ComponentProps<'nav'>, 'onSelect'> {
+  items: readonly { id: string; name: string }[];
   onSelect: (id: string) => void;
-  'aria-label': string;
 }
 
-export function Breadcrumbs({ items, onSelect, 'aria-label': ariaLabel }: BreadcrumbsProps) {
+export function Breadcrumbs({ items, onSelect, ...props }: BreadcrumbsProps) {
   return (
-    <nav aria-label={ariaLabel}>
+    <nav {...props}>
       <ol className={styles.list}>
-        {items.map((item, index) => {
-          const isCurrent = index === items.length - 1;
-          return (
-            <li key={item.id} className={styles.item}>
-              {isCurrent ? (
-                <span aria-current="location" className={styles.current}>
-                  {item.label}
-                </span>
-              ) : (
-                <button type="button" className={styles.link} onClick={() => onSelect(item.id)}>
-                  {item.label}
-                </button>
-              )}
-            </li>
-          );
-        })}
+        {items.map((item, index) => (
+          <li key={item.id} className={styles.item}>
+            {index === items.length - 1 ? (
+              <span aria-current="location" className={styles.current}>
+                {item.name}
+              </span>
+            ) : (
+              <button type="button" className={styles.link} onClick={() => onSelect(item.id)}>
+                {item.name}
+              </button>
+            )}
+          </li>
+        ))}
       </ol>
     </nav>
   );

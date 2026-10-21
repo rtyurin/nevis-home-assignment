@@ -30,8 +30,7 @@ export function ClientsPage() {
 function ClientsDashboard() {
   const { data } = useSuspenseQuery(clientsQueryOptions());
   return (
-    // The company starts expanded, as in the design. A new tree resets the drill-down.
-    <DrilldownProvider key={data.root.id} init={{ expandedIds: [data.root.id] }}>
+    <DrilldownProvider key={data.root.id} rootId={data.root.id}>
       <div className={styles.stack}>
         <ClientsChart />
         <ClientsTable />

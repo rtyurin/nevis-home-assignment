@@ -1,9 +1,10 @@
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { useId } from 'react';
-import { clientsQueryOptions, getBreakdown } from '@/entities/client';
+import { clientsQueryOptions, getBreakdown, pathTo } from '@/entities/client';
+import { useDrilldown } from '../model/drilldownStore';
 import { useSelectedNode } from '../model/useSelectedNode';
-import { DrilldownBreadcrumbs } from './DrilldownBreadcrumbs';
 import { formatMonth, formatMonthShort, formatNumber } from '@/shared/lib';
+import { Breadcrumbs } from '@/shared/ui/breadcrumbs';
 import { Panel } from '@/shared/ui/panel';
 import { StackedBarChart, type ChartCategory } from '@/shared/ui/stacked-bar-chart';
 import { SERIES_COLORS, toChartSeries } from '../lib/toChartSeries';
@@ -14,6 +15,7 @@ import styles from './ClientsChart.module.css';
 export function ClientsChart() {
   const { data } = useSuspenseQuery(clientsQueryOptions());
   const node = useSelectedNode(data);
+  const select = useDrilldown((state) => state.select);
   const breakdown = getBreakdown(node, { maxSeries: SERIES_COLORS.length });
   const titleId = useId();
   const descriptionId = useId();
@@ -31,7 +33,7 @@ export function ClientsChart() {
         {`${node.name} clients${breakdown.dimension ? ` by ${breakdown.dimension}` : ''}`}
       </h2>
       <div className={styles.header}>
-        <DrilldownBreadcrumbs data={data} label="Chart scope" />
+        <Breadcrumbs aria-label="Chart scope" items={pathTo(data.index, node.id)} onSelect={select} />
         {breakdown.dimension && <span className={styles.dimension}>by {breakdown.dimension}</span>}
       </div>
       <p id={descriptionId} className="sr-only">
