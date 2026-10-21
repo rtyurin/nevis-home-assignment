@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "dev": "tsx watch src/index.ts",
-    "build": "tsc -p tsconfig.build.json && node -e \"require('fs').cpSync('src/data/clients.json','dist/data/clients.json')\"",
+    "build": "tsc -p tsconfig.build.json && node -e \"const fs = require('fs'); fs.cpSync('src/data/clients.json', 'dist/data/clients.json'); fs.writeFileSync('dist/package.json', JSON.stringify({ type: 'module' }))\"",
     "start": "node dist/index.js",
     "test": "vitest run",
     "typecheck": "tsc --noEmit"
