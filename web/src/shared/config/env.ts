@@ -1,13 +1,9 @@
-/** Base URL of the API; same origin by default (proxied by Vite in dev). */
-export const API_BASE_URL: string = import.meta.env.VITE_API_URL ?? '';
+const API_BASE_URL = import.meta.env.VITE_API_URL ?? '';
 
-/**
- * Query parameters the dev API understands for exercising loading and error
- * states (`?delay=2000`, `?fail=1`). Forwarded from the page URL.
- */
+/** Dev API params for simulating loading and error states (`?delay=2000`, `?fail=1`). */
 const SIMULATION_PARAMS = ['delay', 'fail'] as const;
 
-/** Absolute URL for an API path, carrying any simulation params from the page URL. */
+/** Absolute URL for an API path, forwarding any simulation params from the page URL. */
 export function apiUrl(path: string): string {
   const url = new URL(`${API_BASE_URL}${path}`, window.location.origin);
   const page = new URLSearchParams(window.location.search);

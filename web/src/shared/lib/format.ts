@@ -2,8 +2,7 @@ const monthLong = new Intl.DateTimeFormat('en-US', { month: 'short', year: 'nume
 const monthShort = new Intl.DateTimeFormat('en-US', { month: 'short', year: '2-digit', timeZone: 'UTC' });
 const integer = new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 });
 
-/** `"2024-02"` -> Date at the first of that month, UTC. */
-export function parseYearMonth(yearMonth: string): Date {
+function parseYearMonth(yearMonth: string): Date {
   const [year, month] = yearMonth.split('-').map(Number) as [number, number];
   return new Date(Date.UTC(year, month - 1, 1));
 }

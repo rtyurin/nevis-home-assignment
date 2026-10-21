@@ -1,1 +1,1 @@
-export { formatMonth, formatMonthShort, formatNumber, parseYearMonth } from './format';
+export { formatMonth, formatMonthShort, formatNumber } from './format';
