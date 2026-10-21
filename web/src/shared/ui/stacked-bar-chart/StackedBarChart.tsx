@@ -137,7 +137,7 @@ export function StackedBarChart({
           ))}
         </BarChart>
       </ResponsiveContainer>
-      {series.length > 1 && <ChartLegend items={series} />}
+      {series.length > 0 && <ChartLegend items={series} />}
     </div>
   );
 }

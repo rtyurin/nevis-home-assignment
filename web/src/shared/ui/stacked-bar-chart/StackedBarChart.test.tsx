@@ -92,12 +92,12 @@ describe('StackedBarChart', () => {
     expect(segments(container)).toEqual([]);
   });
 
-  it('shows a legend for two or more series only', () => {
+  it('shows a legend, even for a single series', () => {
     const { unmount } = renderChart();
     expect(screen.getByRole('list', { name: 'Legend' })).toHaveTextContent('AlphaBeta');
     unmount();
 
     renderChart({ series: [series[0]!] });
-    expect(screen.queryByRole('list', { name: 'Legend' })).toBeNull();
+    expect(screen.getByRole('list', { name: 'Legend' })).toHaveTextContent('Alpha');
   });
 });

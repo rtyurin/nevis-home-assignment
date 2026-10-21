@@ -88,7 +88,7 @@ describe('ClientsPage', () => {
 
     await user.keyboard('{ArrowRight}');
     expect(row('Existing clients')).toHaveFocus();
-    expect(screen.queryByRole('list', { name: 'Legend' })).toBeNull();
+    expect(legend()).toEqual(['Existing clients']);
 
     await user.click(within(chartScope()).getByRole('button', { name: 'Company' }));
     expect(legend()).toEqual(['Branch 1', 'Branch 2', 'Branch 3', 'Not broken down']);

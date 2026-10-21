@@ -15,7 +15,7 @@ import styles from './StackedBarChartSkeleton.module.css';
 export interface StackedBarChartSkeletonProps {
   /** One bar per category, as a share (0–1) of the plot height. */
   bars: readonly number[];
-  /** Legend entries to stand in for. The chart shows no legend for a single series. */
+  /** Legend entries to stand in for. */
   seriesCount: number;
   height?: number;
 }
@@ -60,7 +60,7 @@ export function StackedBarChartSkeleton({ bars, seriesCount, height = CHART_HEIG
           ))}
         </div>
       </div>
-      {seriesCount > 1 && (
+      {seriesCount > 0 && (
         <div className={styles.legend}>
           {Array.from({ length: seriesCount }, (_, i) => (
             <span key={i} className={styles.legendItem}>
