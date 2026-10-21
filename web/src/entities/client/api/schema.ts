@@ -1,14 +1,14 @@
-import { z } from 'zod';
+import { z } from 'zod/mini';
 
-const values = z.array(z.number().nonnegative().nullable());
+const values = z.array(z.nullable(z.number().check(z.nonnegative())));
 const channel = z.object({ id: z.string(), name: z.string(), values });
-const employee = channel.extend({ channels: z.array(channel).optional() });
-const branch = channel.extend({ employees: z.array(employee).optional() });
-const company = channel.extend({ branches: z.array(branch).optional() });
+const employee = z.extend(channel, { channels: z.optional(z.array(channel)) });
+const branch = z.extend(channel, { employees: z.optional(z.array(employee)) });
+const company = z.extend(channel, { branches: z.optional(z.array(branch)) });
 
 /** GET /api/clients */
 export const clientsResponseSchema = z.object({
-  months: z.array(z.string().regex(/^\d{4}-\d{2}$/)).min(1),
+  months: z.array(z.string().check(z.regex(/^\d{4}-\d{2}$/))).check(z.minLength(1)),
   company,
 });
 

@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from 'zod/mini';
 
 export class ApiError extends Error {
   readonly status: number | undefined;
@@ -17,14 +17,9 @@ export class ApiError extends Error {
   }
 }
 
-/** The API's error envelope: `{ error: { code, message } }`. */
 const errorBody = z.object({ error: z.object({ code: z.string(), message: z.string() }) });
 
-/**
- * GET a JSON resource and validate it against `schema`.
- * Every failure (network, HTTP status, shape) surfaces as an `ApiError`.
- */
-export async function getJson<T>(url: string, schema: z.ZodType<T>, signal?: AbortSignal): Promise<T> {
+export async function getJson<T>(url: string, schema: z.ZodMiniType<T>, signal?: AbortSignal): Promise<T> {
   let response: Response;
   try {
     response = await fetch(url, { signal, headers: { Accept: 'application/json' } });
@@ -53,7 +48,6 @@ export async function getJson<T>(url: string, schema: z.ZodType<T>, signal?: Abo
   return parsed.data;
 }
 
-/** React Query `retry` policy: retry transient failures a couple of times. */
 export function retryTransient(failureCount: number, error: unknown): boolean {
   return error instanceof ApiError && error.retryable && failureCount < 2;
 }
