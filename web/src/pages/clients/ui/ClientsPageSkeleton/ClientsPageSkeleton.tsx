@@ -2,9 +2,9 @@ import { Panel } from '@/shared/ui/panel';
 import { Skeleton } from '@/shared/ui/skeleton';
 import { StackedBarChartSkeleton } from '@/shared/ui/stacked-bar-chart';
 import { TreeTableSkeleton } from '@/shared/ui/tree-table';
-import { MONTH_COLUMN_META, NAME_COLUMN_META } from '../model/columns';
-import chartStyles from './ClientsChart.module.css';
-import pageStyles from './ClientsPage.module.css';
+import { MONTH_COLUMN_META, NAME_COLUMN_META } from '../../model/columns';
+import chartStyles from '../ClientsChart/ClientsChart.module.css';
+import pageStyles from '../ClientsPage/ClientsPage.module.css';
 import styles from './ClientsPageSkeleton.module.css';
 
 /** A year of monthly totals, as shares of the axis. */

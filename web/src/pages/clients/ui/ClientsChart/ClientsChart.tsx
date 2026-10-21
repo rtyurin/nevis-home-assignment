@@ -1,13 +1,13 @@
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { useId } from 'react';
 import { clientsQueryOptions, getBreakdown, pathTo } from '@/entities/client';
-import { useDrilldown } from '../model/drilldownStore';
-import { useSelectedNode } from '../model/useSelectedNode';
+import { useDrilldown } from '../../model/drilldownStore';
+import { useSelectedNode } from '../../model/useSelectedNode';
 import { formatMonth, formatMonthShort, formatNumber } from '@/shared/lib';
 import { Breadcrumbs } from '@/shared/ui/breadcrumbs';
 import { Panel } from '@/shared/ui/panel';
 import { StackedBarChart, type ChartCategory } from '@/shared/ui/stacked-bar-chart';
-import { SERIES_COLORS, toChartSeries } from '../lib/toChartSeries';
+import { SERIES_COLORS, toChartSeries } from '../../lib/toChartSeries';
 import { MismatchNote } from './MismatchNote';
 import styles from './ClientsChart.module.css';
 
