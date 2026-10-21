@@ -64,3 +64,6 @@ export function createApp({ allowSimulation = false, staticDir }: AppOptions = {
 
   return app;
 }
+
+/** Vercel's Express runtime serves the default export of `src/app.ts`; `index.ts` is for running locally. */
+export default createApp({ allowSimulation: process.env.NODE_ENV !== 'production' });
