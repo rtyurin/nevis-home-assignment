@@ -31,6 +31,11 @@
   stroke-width: 2;
 }
 
+.missingLine {
+  stroke: var(--color-grid);
+  stroke-width: 2;
+}
+
 .cursor {
   fill: rgb(0 0 0 / 0.03);
 }
@@ -81,6 +86,10 @@
 .tooltipTitle {
   margin-bottom: 6px;
   font-weight: 600;
+}
+
+.tooltipEmpty {
+  color: var(--color-text-secondary);
 }
 
 .tooltipRows {

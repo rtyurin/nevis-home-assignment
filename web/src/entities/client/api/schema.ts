@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-const values = z.array(z.number().finite().nonnegative());
+const values = z.array(z.number().finite().nonnegative().nullable());
 const channel = z.object({ id: z.string(), name: z.string(), values });
 const employee = channel.extend({ channels: z.array(channel).optional() });
 const branch = channel.extend({ employees: z.array(employee).optional() });

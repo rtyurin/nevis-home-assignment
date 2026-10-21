@@ -16,10 +16,19 @@ export function clientColumns(months: readonly string[]): TreeTableColumn<Client
       meta: NAME_COLUMN_META,
     }),
     ...months.map((month, i) =>
-      column.accessor((node) => node.values[i] ?? 0, {
+      column.accessor((node) => node.values[i] ?? null, {
         id: month,
         header: formatMonth(month),
-        cell: ({ getValue }) => formatNumber(getValue()),
+        cell: ({ getValue }) => {
+          const value = getValue();
+          if (value !== null) return formatNumber(value);
+          return (
+            <>
+              <span aria-hidden="true">—</span>
+              <span className="sr-only">No data</span>
+            </>
+          );
+        },
         meta: MONTH_COLUMN_META,
       }),
     ),

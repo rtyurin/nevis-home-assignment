@@ -8,8 +8,10 @@ import {
   CAP_RADIUS,
   CHART_HEIGHT,
   CHART_TOP_MARGIN,
+  MISSING_PLACEHOLDER_HEIGHT,
   X_AXIS_HEIGHT,
   Y_AXIS_WIDTH,
+  ZERO_STUB_HEIGHT,
 } from './layout';
 import { barPath, niceScale, toChartRows, type ChartRow } from './toChartRows';
 import type { ChartCategory, ChartSeries } from './types';
@@ -20,7 +22,7 @@ export interface StackedBarChartProps {
   /** Stacked bottom-to-top in array order. */
   series: readonly ChartSeries[];
   /** Per-category totals for the tooltip. Defaults to the sum of the stack. */
-  totals?: readonly number[];
+  totals?: readonly (number | null)[];
   height?: number;
   formatValue?: (value: number) => string;
   /** Extra content at the bottom of the tooltip for a category. */
@@ -45,8 +47,10 @@ export function StackedBarChart({
   ...ariaProps
 }: StackedBarChartProps) {
   const rows = toChartRows(categories, series, totals);
-  const scale = niceScale(Math.max(0, ...rows.map((row) => Math.max(row.total, sumOf(row.values)))));
-  const patternId = `hatch-${useId().replace(/:/g, '')}`;
+  const scale = niceScale(Math.max(0, ...rows.map((row) => Math.max(row.total ?? 0, sumOf(row.values)))));
+  const chartId = useId().replace(/:/g, '');
+  const patternId = `hatch-${chartId}`;
+  const missingPatternId = `missing-${chartId}`;
   const reduceMotion = useReducedMotion() ?? false;
   const [band, setBand] = useState<number>();
   const narrow = band !== undefined && band < FULL_LABEL_MIN_BAND;
@@ -68,14 +72,23 @@ export function StackedBarChart({
           barCategoryGap={`${((1 - BAR_MIN_SHARE) / 2) * 100}%`}
           accessibilityLayer
         >
-          {hatchColor && (
-            <defs>
+          <defs>
+            {hatchColor && (
               <pattern id={patternId} width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
                 <rect width="6" height="6" style={{ fill: hatchColor }} />
                 <line x1="0" y1="0" x2="0" y2="6" className={styles.hatchLine} />
               </pattern>
-            </defs>
-          )}
+            )}
+            <pattern
+              id={missingPatternId}
+              width="6"
+              height="6"
+              patternUnits="userSpaceOnUse"
+              patternTransform="rotate(45)"
+            >
+              <line x1="0" y1="0" x2="0" y2="6" className={styles.missingLine} />
+            </pattern>
+          </defs>
           <CartesianGrid vertical={false} />
           <XAxis
             // Short labels when narrow. (Not via tickFormatter's index: once ticks are thinned
@@ -122,7 +135,13 @@ export function StackedBarChart({
               isAnimationActive={!reduceMotion}
               animationDuration={400}
               shape={(props: BarShapeProps) => (
-                <Segment {...props} seriesId={s.id} fill={s.pattern === 'hatch' ? `url(#${patternId})` : s.color} />
+                <Segment
+                  {...props}
+                  seriesId={s.id}
+                  fill={s.pattern === 'hatch' ? `url(#${patternId})` : s.color}
+                  color={s.color}
+                  missingFill={`url(#${missingPatternId})`}
+                />
               )}
             />
           ))}
@@ -133,20 +152,47 @@ export function StackedBarChart({
   );
 }
 
-const sumOf = (values: Record<string, number>) => Object.values(values).reduce((a, b) => a + b, 0);
+const sumOf = (values: Record<string, number | null>) =>
+  Object.values(values).reduce<number>((a, b) => a + (b ?? 0), 0);
 
-function Segment({ x, y, width, height, payload, seriesId, fill }: BarShapeProps & { seriesId: string; fill: string }) {
+interface SegmentProps extends BarShapeProps {
+  seriesId: string;
+  fill: string;
+  /** The series' plain color, for its zero stub. */
+  color: string;
+  missingFill: string;
+}
+
+function Segment({ x, y, width, height, payload, seriesId, fill, color, missingFill }: SegmentProps) {
   const row = payload as ChartRow;
+  if (row.marker?.seriesId === seriesId) {
+    const missing = row.marker.kind === 'missing';
+    const markerHeight = missing ? MISSING_PLACEHOLDER_HEIGHT : ZERO_STUB_HEIGHT;
+    return (
+      <rect
+        x={x}
+        y={y + height - markerHeight}
+        width={width}
+        height={markerHeight}
+        rx={Math.min(CAP_RADIUS, markerHeight / 2)}
+        style={{ fill: missing ? missingFill : color }}
+        data-baseline={row.marker.kind}
+        data-category={row.id}
+      />
+    );
+  }
   if (!(height > 0)) return <g />;
   const isTop = row.topSeriesId === seriesId;
+  const isBottom = row.bottomSeriesId === seriesId;
   return (
     <path
-      d={barPath(x, y, width, height, isTop ? CAP_RADIUS : 0)}
+      d={barPath(x, y, width, height, { top: isTop ? CAP_RADIUS : 0, bottom: isBottom ? CAP_RADIUS : 0 })}
       style={{ fill }}
       data-series={seriesId}
       data-category={row.id}
-      data-value={row.values[seriesId]}
+      data-value={row.values[seriesId] ?? undefined}
       data-top={isTop || undefined}
+      data-bottom={isBottom || undefined}
     />
   );
 }
@@ -159,6 +205,13 @@ interface ChartTooltipProps {
 }
 
 function ChartTooltip({ row, series, formatValue, footer }: ChartTooltipProps) {
+  if (row.total === null) {
+    return (
+      <div className={styles.tooltip}>
+        <p className={styles.tooltipEmpty}>No data for {row.label}</p>
+      </div>
+    );
+  }
   // Top of the stack first, matching what the eye sees.
   const visible = series.filter((s) => (row.values[s.id] ?? 0) > 0).reverse();
   return (

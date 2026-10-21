@@ -6,7 +6,7 @@ import type { ClientsResponse } from './schema';
 /** Normalises the wire format into a uniform tree and checks every series covers every month. */
 export function toClientsData({ months, company }: ClientsResponse): ClientsData {
   const node = (
-    dto: { id: string; name: string; values: number[] },
+    dto: { id: string; name: string; values: (number | null)[] },
     kind: ClientNode['kind'],
     children: ClientNode[] = [],
   ): ClientNode => {

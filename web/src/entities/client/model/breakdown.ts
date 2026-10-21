@@ -5,7 +5,8 @@ export const UNATTRIBUTED_NAME = 'Not broken down';
 export interface BreakdownSeries {
   id: string;
   name: string;
-  values: number[];
+  /** `null`: no data for that month. */
+  values: (number | null)[];
   /** `unattributed`: the part of the total that no child accounts for. */
   kind: 'child' | 'other' | 'unattributed';
 }
@@ -21,7 +22,7 @@ export interface Breakdown {
   dimension: string | null;
   series: BreakdownSeries[];
   /** The node's own reported figures; the bar totals in the chart. */
-  totals: readonly number[];
+  totals: readonly (number | null)[];
   /** Months where the children don't add up to the node's reported total. */
   mismatches: Mismatch[];
 }
@@ -38,8 +39,15 @@ const DIMENSION_BY_CHILD_KIND: Record<ClientNodeKind, string> = {
   channel: 'channel',
 };
 
-const sumAt = (nodes: readonly { values: readonly number[] }[], i: number) =>
-  nodes.reduce((total, node) => total + (node.values[i] ?? 0), 0);
+/** Sum of the figures there are for month `i`; `null` when none of `nodes` has one. */
+function sumAt(nodes: readonly { values: readonly (number | null)[] }[], i: number): number | null {
+  let total: number | null = null;
+  for (const node of nodes) {
+    const value = node.values[i];
+    if (value != null) total = (total ?? 0) + value;
+  }
+  return total;
+}
 
 /**
  * Splits a node's monthly totals by the level beneath it: one series per direct
@@ -48,7 +56,8 @@ const sumAt = (nodes: readonly { values: readonly number[] }[], i: number) =>
  * The children don't always add up to the node's reported total. Where they fall
  * short, the remainder becomes an `unattributed` series so the stack still reaches
  * the reported figure. Where they exceed it, the series are left as they are.
- * Both cases are listed in `mismatches`.
+ * Both cases are listed in `mismatches`. A month with no reported figure has
+ * nothing to reconcile against, so it is never a mismatch.
  */
 export function getBreakdown(node: ClientNode, { maxSeries = 5 }: BreakdownOptions = {}): Breakdown {
   const totals = node.values;
@@ -66,12 +75,13 @@ export function getBreakdown(node: ClientNode, { maxSeries = 5 }: BreakdownOptio
 
   const mismatches: Mismatch[] = [];
   const shortfall = totals.map((reported, i) => {
-    const breakdownSum = sumAt(node.children, i);
+    if (reported === null) return null;
+    const breakdownSum = sumAt(node.children, i) ?? 0;
     if (breakdownSum !== reported) mismatches.push({ monthIndex: i, reported, breakdownSum });
     return Math.max(0, reported - breakdownSum);
   });
 
-  if (shortfall.some((value) => value > 0)) {
+  if (shortfall.some((value) => (value ?? 0) > 0)) {
     series.push({ id: `${node.id}:unattributed`, name: UNATTRIBUTED_NAME, values: shortfall, kind: 'unattributed' });
   }
 

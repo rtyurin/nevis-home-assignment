@@ -8,8 +8,8 @@ export interface ChartCategory {
 export interface ChartSeries {
   id: string;
   name: string;
-  /** One value per category. */
-  values: readonly number[];
+  /** One value per category. `null`: no data for that category. */
+  values: readonly (number | null)[];
   /** Any CSS color. */
   color: string;
   /** Hatched fill, for series that should read as "not a real category". */

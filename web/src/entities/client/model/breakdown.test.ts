@@ -3,7 +3,7 @@ import { nodeByName } from '@/test/fixtures';
 import { getBreakdown, UNATTRIBUTED_NAME } from './breakdown';
 import type { ClientNode } from './types';
 
-const sumAt = (series: { values: readonly number[] }[], i: number) =>
+const sumAt = (series: { values: readonly (number | null)[] }[], i: number) =>
   series.reduce((total, s) => total + (s.values[i] ?? 0), 0);
 
 describe('getBreakdown', () => {
@@ -68,6 +68,32 @@ describe('getBreakdown', () => {
         mismatches: [],
       });
     }
+  });
+
+  it('keeps months without data apart from zeros', () => {
+    const channel = (id: string, values: (number | null)[]): ClientNode => ({
+      id,
+      name: id,
+      kind: 'channel',
+      values,
+      children: [],
+    });
+    const parent: ClientNode = {
+      id: 'p',
+      name: 'Parent',
+      kind: 'employee',
+      // Month 0: one channel has no data. Month 1: nothing reported. Month 2: a real 0.
+      values: [10, null, 0],
+      children: [channel('a', [6, null, 0]), channel('b', [null, null, 0])],
+    };
+
+    const { series, mismatches } = getBreakdown(parent);
+    expect(series.map((s) => s.values)).toEqual([
+      [6, null, 0],
+      [null, null, 0],
+      [4, null, 0],
+    ]);
+    expect(mismatches).toEqual([{ monthIndex: 0, reported: 10, breakdownSum: 6 }]);
   });
 
   it('folds children beyond `maxSeries` into "Other"', () => {

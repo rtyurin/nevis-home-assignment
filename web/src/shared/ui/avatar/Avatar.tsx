@@ -15,12 +15,10 @@ function toneFor(name: string): number {
 
 export interface AvatarProps {
   name: string;
-  /** Photo URL; falls back to initials. */
   src?: string;
   size?: number;
 }
 
-/** Decorative: the person's name is always rendered next to it. */
 export function Avatar({ name, src, size = 24 }: AvatarProps) {
   return (
     <span

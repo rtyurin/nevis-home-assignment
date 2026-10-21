@@ -8,7 +8,8 @@
 export interface ChannelDto {
   id: string;
   name: string;
-  values: number[];
+  /** One per month; `null` where there is no data for that month. */
+  values: (number | null)[];
 }
 
 export interface EmployeeDto extends ChannelDto {

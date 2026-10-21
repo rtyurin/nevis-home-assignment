@@ -51,7 +51,7 @@
   position: relative;
   /* barWidth() from layout.ts, in CSS. */
   width: min(var(--bar-max-width), max(100% - 2 * var(--bar-inset), var(--bar-min-share)));
-  border-radius: var(--cap-radius) var(--cap-radius) 0 0;
+  border-radius: var(--cap-radius);
 }
 
 .xAxis {

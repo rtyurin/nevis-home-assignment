@@ -45,6 +45,40 @@ describe('StackedBarChart', () => {
     expect(segments(container)).toHaveLength(3);
   });
 
+  it('rounds the bottom of each stack as well as the top', () => {
+    const { container } = renderChart();
+    const bottoms = Array.from(container.querySelectorAll('path[data-bottom]'), (path) => [
+      path.getAttribute('data-series'),
+      path.getAttribute('data-category'),
+    ]);
+    expect(bottoms).toEqual(
+      expect.arrayContaining([
+        ['a', 'jan'],
+        ['b', 'feb'],
+      ]),
+    );
+    expect(bottoms).toHaveLength(2);
+  });
+
+  it('draws a stub for a real 0 and a placeholder for a category without data', () => {
+    const { container } = renderChart({
+      series: [
+        { id: 'a', name: 'Alpha', values: [0, null], color: 'red' },
+        { id: 'b', name: 'Beta', values: [null, null], color: 'blue' },
+      ],
+    });
+    const markers = Array.from(container.querySelectorAll('rect[data-baseline]'), (rect) => ({
+      kind: rect.getAttribute('data-baseline'),
+      category: rect.getAttribute('data-category'),
+      fill: (rect as SVGRectElement).style.fill,
+    }));
+    expect(markers).toEqual([
+      { kind: 'zero', category: 'jan', fill: 'red' },
+      { kind: 'missing', category: 'feb', fill: expect.stringMatching(/^url\(/) },
+    ]);
+    expect(segments(container)).toEqual([]);
+  });
+
   it('labels the axes from the categories', () => {
     const { container } = renderChart();
     // Recharts wraps tick text in one <tspan> per word.

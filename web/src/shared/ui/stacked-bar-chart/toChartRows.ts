@@ -5,49 +5,84 @@ export interface ChartRow {
   id: string;
   label: string;
   shortLabel: string;
-  values: Record<string, number>;
-  /** Shown as the bar's total; the reported total when given, else the stack sum. */
-  total: number;
-  /** Highest non-empty segment of the stack: the one that gets the rounded cap. */
+  /** `null` where a series has no data for the category. */
+  values: Record<string, number | null>;
+  /** Shown as the bar's total; the reported total when given, else the stack sum. `null`: no data at all. */
+  total: number | null;
+  /** Highest non-empty segment of the stack: the one that gets the rounded top. */
   topSeriesId: string | null;
+  /** Lowest non-empty segment of the stack: the one that gets the rounded bottom. */
+  bottomSeriesId: string | null;
+  /** Drawn on the baseline when nothing stacks above it, by the segment of `seriesId`. */
+  marker: { kind: 'zero' | 'missing'; seriesId: string } | null;
 }
 
 export function toChartRows(
   categories: readonly ChartCategory[],
   series: readonly ChartSeries[],
-  totals?: readonly number[],
+  totals?: readonly (number | null)[],
 ): ChartRow[] {
   return categories.map((category, index) => {
-    const values: Record<string, number> = {};
+    const values: Record<string, number | null> = {};
     let topSeriesId: string | null = null;
-    let sum = 0;
+    let bottomSeriesId: string | null = null;
+    let zeroSeriesId: string | null = null;
+    let sum: number | null = null;
     for (const s of series) {
-      const value = Math.max(0, s.values[index] ?? 0);
+      const raw = s.values[index];
+      const value = raw == null ? null : Math.max(0, raw);
       values[s.id] = value;
-      sum += value;
-      if (value > 0) topSeriesId = s.id;
+      if (value === null) continue;
+      sum = (sum ?? 0) + value;
+      if (value > 0) {
+        topSeriesId = s.id;
+        bottomSeriesId ??= s.id;
+      } else {
+        zeroSeriesId ??= s.id;
+      }
     }
+    const total = totals?.[index] ?? sum;
+    // A real 0 takes the color of a series that reported it.
+    const markerSeriesId = zeroSeriesId ?? series[0]?.id;
     return {
       id: category.id,
       label: category.label,
       shortLabel: category.shortLabel ?? category.label,
       values,
-      total: totals?.[index] ?? sum,
+      total,
       topSeriesId,
+      bottomSeriesId,
+      marker:
+        topSeriesId === null && markerSeriesId !== undefined
+          ? { kind: total === null ? 'missing' : 'zero', seriesId: markerSeriesId }
+          : null,
     };
   });
 }
 
-/** SVG path for a bar with optionally rounded top corners. */
-export function barPath(x: number, y: number, width: number, height: number, radius: number): string {
-  const r = Math.max(0, Math.min(radius, height, width / 2));
+/** SVG path for a bar with optionally rounded top and bottom corners. */
+export function barPath(
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+  { top = 0, bottom = 0 }: { top?: number; bottom?: number },
+): string {
+  // Rounded at both ends, each end gets at most half the height.
+  const limit = Math.min(width / 2, top > 0 && bottom > 0 ? height / 2 : height);
+  const t = Math.max(0, Math.min(top, limit));
+  const b = Math.max(0, Math.min(bottom, limit));
+  const y2 = y + height;
   return [
-    `M${x},${y + height}`,
-    `V${y + r}`,
-    `Q${x},${y} ${x + r},${y}`,
-    `H${x + width - r}`,
-    `Q${x + width},${y} ${x + width},${y + r}`,
-    `V${y + height}`,
+    `M${x},${y2 - b}`,
+    `V${y + t}`,
+    `Q${x},${y} ${x + t},${y}`,
+    `H${x + width - t}`,
+    `Q${x + width},${y} ${x + width},${y + t}`,
+    `V${y2 - b}`,
+    `Q${x + width},${y2} ${x + width - b},${y2}`,
+    `H${x + b}`,
+    `Q${x},${y2} ${x},${y2 - b}`,
     'Z',
   ].join(' ');
 }

@@ -4,8 +4,8 @@ export interface ClientNode {
   id: string;
   name: string;
   kind: ClientNodeKind;
-  /** Client count per month, aligned with `ClientsData.months`. */
-  values: readonly number[];
+  /** Client count per month, aligned with `ClientsData.months`. `null`: no data for that month. */
+  values: readonly (number | null)[];
   children: readonly ClientNode[];
 }
 
