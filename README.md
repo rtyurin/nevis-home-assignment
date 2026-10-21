@@ -104,5 +104,4 @@ A few things I'd want to ask:
 
 If I had more time, I'd test the selection behaviour with real users before settling on it, and agree with the data
 owners on how the totals should reconcile. On the technical side, I'd share the API types between server and web,
-give the chart and the table their own error boundaries, keep the current view in the URL so it can be shared, and
-add Playwright tests with axe checks.
+keep the current view in the URL so it can be shared, and add Playwright tests with axe checks.
