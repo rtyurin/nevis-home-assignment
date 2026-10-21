@@ -8,7 +8,6 @@ export function AppProviders({ children }: { children: ReactNode }) {
   );
   return (
     <QueryClientProvider client={queryClient}>
-      {/* Honour the OS "reduce motion" setting for every animation. */}
       <MotionConfig reducedMotion="user">{children}</MotionConfig>
     </QueryClientProvider>
   );

@@ -6,7 +6,6 @@ export interface SkeletonProps extends ComponentPropsWithoutRef<'span'> {
   height?: number | string;
 }
 
-/** Pulsing placeholder block, sized to stand in for content that is still loading. */
 export function Skeleton({ width, height, className, style, ...props }: SkeletonProps) {
   return (
     <span

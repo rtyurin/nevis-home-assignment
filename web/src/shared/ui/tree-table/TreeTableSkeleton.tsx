@@ -13,7 +13,7 @@ export interface TreeTableSkeletonProps {
   rowHeight?: number;
 }
 
-/** Loading placeholder on the TreeTable's own grid: same column tracks, paddings and row height. */
+/** Built on the TreeTable's own grid styles, so tracks, paddings and row height match. */
 export function TreeTableSkeleton({ columns, rows, rowHeight = 56 }: TreeTableSkeletonProps) {
   const [, ...valueColumns] = columns;
   return (

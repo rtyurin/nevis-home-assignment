@@ -7,7 +7,6 @@ const column = createTreeTableColumnHelper<ClientNode>();
 export const NAME_COLUMN_META: TreeTableColumnMeta = { minWidth: 240, grow: 3 };
 export const MONTH_COLUMN_META: TreeTableColumnMeta = { align: 'end', minWidth: 84 };
 
-/** Name column, then one right-aligned column per month. */
 export function clientColumns(months: readonly string[]): TreeTableColumn<ClientNode>[] {
   return [
     column.accessor('name', {

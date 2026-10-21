@@ -16,7 +16,6 @@ export interface TreeTableColumnMeta {
   grow?: number;
 }
 
-/** The TanStack Table features every TreeTable runs with. */
 export const treeTableFeatures = tableFeatures({
   rowExpandingFeature,
   expandedRowModel: createExpandedRowModel(),

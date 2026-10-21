@@ -6,12 +6,9 @@ const DEFAULT_MIN_WIDTH = 84;
 const TREE_COLUMN_MAX_VW = 50;
 
 /**
- * Column layout shared by every row.
- *
- * Rows are absolutely positioned (virtualized and animated), so they can't share a
- * native table layout: each row is its own CSS grid. Giving every row the same
- * `grid-template-columns` keeps the columns aligned. Below the sum of the
- * columns' minimum widths, the table scrolls horizontally instead of squashing.
+ * Rows are absolutely positioned (virtualized and animated), so each is its own CSS grid;
+ * sharing one `grid-template-columns` keeps them aligned. Below the columns' summed
+ * minimum widths, the table scrolls horizontally.
  */
 export function columnLayoutStyle(
   columns: readonly { columnDef: { meta?: TreeTableColumnMeta } }[],

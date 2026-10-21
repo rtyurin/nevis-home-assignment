@@ -4,8 +4,7 @@ import { defineConfig } from 'steiger';
 export default defineConfig([
   ...fsd.configs.recommended,
   {
-    // The domain layer is a deliberate boundary even with a single page today:
-    // the client tree, its API and its maths don't belong to any one screen.
+    // Kept as an entity even with one page: the client tree and its maths aren't page-specific.
     files: ['./src/entities/**'],
     rules: { 'fsd/insignificant-slice': 'off' },
   },

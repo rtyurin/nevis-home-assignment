@@ -6,7 +6,6 @@ export interface PanelProps extends ComponentPropsWithoutRef<'section'> {
   flush?: boolean;
 }
 
-/** White rounded surface that groups one piece of the dashboard. */
 export function Panel({ flush = false, className, ...props }: PanelProps) {
   return <section className={[styles.panel, flush && styles.flush, className].filter(Boolean).join(' ')} {...props} />;
 }

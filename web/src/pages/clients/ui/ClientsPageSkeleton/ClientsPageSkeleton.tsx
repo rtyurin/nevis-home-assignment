@@ -13,7 +13,6 @@ const COLUMNS = [NAME_COLUMN_META, ...BARS.map(() => MONTH_COLUMN_META)];
 /** The company, expanded to its branches. */
 const ROW_DEPTHS = [0, 1, 1, 1];
 
-/** Placeholder in the shape of the chart and table while client data loads. */
 export function ClientsPageSkeleton() {
   return (
     <div role="status" className={pageStyles.stack}>

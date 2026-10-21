@@ -19,9 +19,7 @@ interface Options<TData extends RowData> {
   onExpandedChange: (expanded: TreeExpandedState) => void;
 }
 
-/**
- * Focus, selection, clicks and keys for all rows, as handlers for the grid element
- */
+/** Focus, selection, click and key handling for all rows, delegated from the grid element. */
 export function useRowInteractions<TData extends RowData>({
   rows,
   rootRows,

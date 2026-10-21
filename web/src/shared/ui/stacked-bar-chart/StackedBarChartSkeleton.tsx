@@ -23,7 +23,7 @@ export interface StackedBarChartSkeletonProps {
 /** Five gridlines, as for a typical 0–400 scale. */
 const GRID_LINES = [0, 0.25, 0.5, 0.75, 1];
 
-/** Loading placeholder with the chart's geometry: same plot area, bar width and legend. */
+/** Shares the chart's geometry (layout.ts), so the swap to the loaded chart doesn't shift. */
 export function StackedBarChartSkeleton({ bars, seriesCount, height = CHART_HEIGHT }: StackedBarChartSkeletonProps) {
   const layout = {
     '--chart-height': `${height}px`,
