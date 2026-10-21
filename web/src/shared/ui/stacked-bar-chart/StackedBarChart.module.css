@@ -22,7 +22,8 @@
   border-radius: 4px;
 }
 
-.root :global(.recharts-wrapper) {
+.root :global(.recharts-wrapper),
+.root g:focus {
   outline: none;
 }
 
