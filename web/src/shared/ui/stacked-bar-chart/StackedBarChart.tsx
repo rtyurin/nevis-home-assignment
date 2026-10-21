@@ -27,6 +27,8 @@ export interface StackedBarChartProps {
   formatValue?: (value: number) => string;
   /** Extra content at the bottom of the tooltip for a category. */
   renderTooltipFooter?: (index: number) => ReactNode;
+  /** Changing it remounts the bars so they replay their entrance, even for series that carry over. */
+  animationKey?: string;
   'aria-labelledby'?: string;
   'aria-describedby'?: string;
 }
@@ -46,6 +48,7 @@ export function StackedBarChart({
   height = CHART_HEIGHT,
   formatValue = defaultFormat,
   renderTooltipFooter,
+  animationKey = '',
   ...ariaProps
 }: StackedBarChartProps) {
   const rows = toChartRows(categories, series, totals);
@@ -129,7 +132,7 @@ export function StackedBarChart({
           />
           {series.map((s) => (
             <Bar
-              key={s.id}
+              key={`${animationKey}:${s.id}`}
               name={s.name}
               dataKey={(row: ChartRow) => row.values[s.id] ?? 0}
               stackId="stack"

@@ -12,14 +12,14 @@ const series = [
   { id: 'b', name: 'Beta', values: [5, 20], color: 'blue' },
 ];
 
-function renderChart(props: Partial<StackedBarChartProps> = {}) {
-  return render(
-    <>
-      <h2 id="title">Test chart</h2>
-      <StackedBarChart aria-labelledby="title" categories={categories} series={series} {...props} />
-    </>,
-  );
-}
+const chart = (props: Partial<StackedBarChartProps> = {}) => (
+  <>
+    <h2 id="title">Test chart</h2>
+    <StackedBarChart aria-labelledby="title" categories={categories} series={series} {...props} />
+  </>
+);
+
+const renderChart = (props?: Partial<StackedBarChartProps>) => render(chart(props));
 
 const segments = (container: HTMLElement) =>
   Array.from(container.querySelectorAll('path[data-series]')).map((path) => ({
@@ -43,6 +43,19 @@ describe('StackedBarChart', () => {
     );
     // Alpha is 0 in February: no empty segment.
     expect(segments(container)).toHaveLength(3);
+  });
+
+  it('remounts the bars when animationKey changes, even with the same series', () => {
+    const { container, rerender } = renderChart({ animationKey: 'one' });
+    const segment = () => container.querySelector('path[data-series="a"][data-category="jan"]');
+    const first = segment();
+
+    rerender(chart({ animationKey: 'one' }));
+    expect(segment()).toBe(first);
+
+    rerender(chart({ animationKey: 'two' }));
+    expect(segment()).not.toBe(first);
+    expect(segment()).toBeInTheDocument();
   });
 
   it('rounds the bottom of each stack as well as the top', () => {

@@ -47,6 +47,7 @@ export function ClientsChart() {
         series={toChartSeries(breakdown.series)}
         totals={breakdown.totals}
         formatValue={formatNumber}
+        animationKey={node.id}
         renderTooltipFooter={(index) => {
           const mismatch = mismatchByMonth.get(index);
           return mismatch ? `Breakdown adds up to ${formatNumber(mismatch.breakdownSum)}` : null;
