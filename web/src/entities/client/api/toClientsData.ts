@@ -10,7 +10,7 @@ type Channel = NonNullable<Employee['channels']>[number];
 /** Normalises the wire format into a uniform tree and checks every series covers every month. */
 export function toClientsData({ months, company }: ClientsResponse): ClientsData {
   const node = (
-    dto: { id: string; name: string; values: (number | null)[] },
+    dto: { id: string; name: string; values: (number | null)[]; avatarUrl?: string },
     kind: ClientNode['kind'],
     children: ClientNode[] = [],
   ): ClientNode => {
@@ -19,7 +19,14 @@ export function toClientsData({ months, company }: ClientsResponse): ClientsData
         code: 'INVALID_PAYLOAD',
       });
     }
-    return { id: dto.id, name: dto.name, kind, values: dto.values, children };
+    return {
+      id: dto.id,
+      name: dto.name,
+      kind,
+      values: dto.values,
+      children,
+      ...(dto.avatarUrl ? { avatarUrl: dto.avatarUrl } : {}),
+    };
   };
 
   const channel = (c: Channel) => node(c, 'channel');

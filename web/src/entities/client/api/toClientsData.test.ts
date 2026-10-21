@@ -19,6 +19,22 @@ describe('toClientsData', () => {
     expect(index.size).toBe(1 + 3 + 5 + 3);
   });
 
+  it('keeps an advisor photo where the API sends one', () => {
+    const [branch] = clientsResponse.company.branches!;
+    const [anna, ...others] = branch!.employees!;
+    const withPhoto = {
+      ...clientsResponse,
+      company: {
+        ...clientsResponse.company,
+        branches: [{ ...branch!, employees: [{ ...anna!, avatarUrl: '/avatars/anna.png' }, ...others] }],
+      },
+    };
+
+    const [annaNode, jamesNode] = toClientsData(withPhoto).root.children[0]!.children;
+    expect(annaNode!.avatarUrl).toBe('/avatars/anna.png');
+    expect(jamesNode).not.toHaveProperty('avatarUrl');
+  });
+
   it('rejects series that do not cover every month', () => {
     const broken = { ...clientsResponse, months: clientsResponse.months.slice(0, 11) };
     expect(() => toClientsData(broken)).toThrow(ApiError);

@@ -7,6 +7,8 @@ export interface ClientNode {
   /** Client count per month, aligned with `ClientsData.months`. `null`: no data for that month. */
   values: readonly (number | null)[];
   children: readonly ClientNode[];
+  /** Advisor photo, where the API has one. */
+  avatarUrl?: string;
 }
 
 export interface ClientIndexEntry {

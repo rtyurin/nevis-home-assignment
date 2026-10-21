@@ -57,13 +57,20 @@ describe('ClientsPage', () => {
   });
 
   it('charts the company split by branch by default', async () => {
-    await renderLoaded();
+    const user = await renderLoaded();
 
     expect(within(chartScope()).getByText('Company')).toHaveAttribute('aria-current', 'location');
     expect(legend()).toEqual(['Branch 1', 'Branch 2', 'Branch 3', 'Not broken down']);
     // May 2024: three branches plus the 22 clients no branch accounts for.
     expect(segmentsFor('2024-05')).toEqual([156, 87, 36, 22]);
-    expect(screen.getByRole('note')).toHaveTextContent('reported total in May 2024 (279 vs 301 reported)');
+
+    const mismatches = screen.getByRole('button', { name: '1 month doesn’t add up' });
+    await user.click(mismatches);
+    expect(mismatches).toHaveAttribute('aria-expanded', 'true');
+    expect(screen.getByText('May 2024: 279 vs 301 reported')).toBeVisible();
+    await user.keyboard('{Escape}');
+    expect(mismatches).toHaveAttribute('aria-expanded', 'false');
+    expect(mismatches).toHaveFocus();
   });
 
   it('drills the table and the chart down together', async () => {

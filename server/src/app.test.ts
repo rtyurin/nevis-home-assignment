@@ -17,6 +17,10 @@ describe('GET /api/clients', () => {
       'Branch 2',
       'Branch 3',
     ]);
+    expect(res.body.company.branches[0].employees[0]).toMatchObject({
+      name: 'Anna Blackwood',
+      avatarUrl: '/avatars/anna-blackwood.png',
+    });
   });
 
   it('simulates failures only when allowed', async () => {

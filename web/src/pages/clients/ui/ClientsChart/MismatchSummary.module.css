@@ -1,0 +1,6 @@
+.list {
+  margin: 6px 0;
+  padding-left: 18px;
+  color: var(--color-text);
+  font-variant-numeric: tabular-nums;
+}

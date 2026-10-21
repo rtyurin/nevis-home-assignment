@@ -7,6 +7,8 @@ export interface ChannelDto {
 }
 
 export interface EmployeeDto extends ChannelDto {
+  /** Not in the brief's data: added by the API where an advisor has a photo. */
+  avatarUrl?: string;
   channels?: ChannelDto[];
 }
 

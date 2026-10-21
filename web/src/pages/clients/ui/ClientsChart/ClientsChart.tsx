@@ -7,7 +7,7 @@ import { Panel } from '@/shared/ui/panel';
 import { StackedBarChart, type ChartCategory } from '@/shared/ui/stacked-bar-chart';
 import { SERIES_COLORS, toChartSeries } from '../../lib/toChartSeries';
 import { useDrilldown } from '../../model/drilldownStore';
-import { MismatchNote } from './MismatchNote';
+import { MismatchSummary } from './MismatchSummary';
 import styles from './ClientsChart.module.css';
 
 /** Monthly clients for the drilled-into node, stacked by the level beneath it. */
@@ -35,6 +35,13 @@ export function ClientsChart() {
       <div className={styles.header}>
         <Breadcrumbs aria-label="Chart scope" items={pathTo(data.index, node.id)} onSelect={select} />
         {breakdown.dimension && <span className={styles.dimension}>by {breakdown.dimension}</span>}
+        <MismatchSummary
+          key={node.id}
+          className={styles.mismatches}
+          node={node}
+          breakdown={breakdown}
+          months={categories}
+        />
       </div>
       <p id={descriptionId} className="sr-only">
         Monthly number of clients from {categories[0]?.label} to {categories.at(-1)?.label}. The same figures are listed
@@ -53,7 +60,6 @@ export function ClientsChart() {
           return mismatch ? `Breakdown adds up to ${formatNumber(mismatch.breakdownSum)}` : null;
         }}
       />
-      <MismatchNote node={node} breakdown={breakdown} months={categories} />
     </Panel>
   );
 }

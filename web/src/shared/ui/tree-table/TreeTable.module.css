@@ -63,7 +63,8 @@
   outline: none;
 }
 
-.row[aria-expanded] {
+.row[aria-expanded],
+.row[aria-selected] {
   cursor: pointer;
 }
 
