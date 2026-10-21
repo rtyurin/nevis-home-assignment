@@ -12,19 +12,24 @@ const legend = () =>
     .getAllByRole('listitem')
     .map((item) => item.textContent);
 const chartScope = () => screen.getByRole('navigation', { name: 'Chart scope' });
-/** Segment values drawn for one month, keyed by series id. */
+/** Segment values drawn for one month, bottom to top. */
 const segmentsFor = (month: string) =>
   Array.from(document.querySelectorAll(`path[data-category="${month}"]`), (path) =>
     Number(path.getAttribute('data-value')),
   );
 
-async function renderLoaded() {
+function renderPage() {
   vi.stubGlobal(
     'fetch',
     vi.fn(async () => jsonResponse(clientsResponse)),
   );
   const user = userEvent.setup();
   renderWithQueryClient(<ClientsPage />);
+  return user;
+}
+
+async function renderLoaded() {
+  const user = renderPage();
   await screen.findByRole('treegrid');
   return user;
 }
@@ -33,11 +38,7 @@ describe('ClientsPage', () => {
   beforeEach(() => mockElementSize());
 
   it('shows a skeleton, then the company expanded to its branches', async () => {
-    vi.stubGlobal(
-      'fetch',
-      vi.fn(async () => jsonResponse(clientsResponse)),
-    );
-    renderWithQueryClient(<ClientsPage />);
+    renderPage();
 
     expect(screen.getByRole('status')).toHaveTextContent('Loading client data');
     expect(await screen.findByRole('treegrid')).toBeInTheDocument();

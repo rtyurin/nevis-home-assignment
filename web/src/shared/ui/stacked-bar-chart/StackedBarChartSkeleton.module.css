@@ -1,4 +1,3 @@
-/* Mirrors StackedBarChart: Recharts plot area, axes and the legend below. */
 .root {
   display: flex;
   flex-direction: column;
@@ -18,7 +17,6 @@
   position: relative;
 }
 
-/* Tick labels ("400") sit right-aligned, centred on their gridline. */
 .yTick {
   position: absolute;
   right: 8px;
@@ -62,7 +60,6 @@
   padding-top: 18px;
 }
 
-/* "Feb 2024" at 12px. */
 .xTick {
   width: min(52px, 80%);
   height: 8px;
@@ -75,7 +72,6 @@
   gap: 4px 16px;
 }
 
-/* One line of 13px legend text. */
 .legendItem {
   display: inline-flex;
   align-items: center;

@@ -1,19 +1,22 @@
 import { useReducedMotion } from 'motion/react';
-import { useId, useState, type CSSProperties, type ReactNode } from 'react';
+import { useId, useState, type ReactNode } from 'react';
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis, type BarShapeProps } from 'recharts';
 import { ChartLegend } from './ChartLegend';
 import {
   BAR_MIN_SHARE,
+  barPath,
   barWidth,
   CAP_RADIUS,
   CHART_HEIGHT,
   CHART_TOP_MARGIN,
   MISSING_PLACEHOLDER_HEIGHT,
+  niceScale,
   X_AXIS_HEIGHT,
   Y_AXIS_WIDTH,
   ZERO_STUB_HEIGHT,
 } from './layout';
-import { barPath, niceScale, toChartRows, type ChartRow } from './toChartRows';
+import { Swatch } from './Swatch';
+import { toChartRows, type ChartRow } from './toChartRows';
 import type { ChartCategory, ChartSeries } from './types';
 import styles from './StackedBarChart.module.css';
 
@@ -25,8 +28,8 @@ export interface StackedBarChartProps {
   totals?: readonly (number | null)[];
   height?: number;
   formatValue?: (value: number) => string;
-  /** Extra content at the bottom of the tooltip for a category. */
-  renderTooltipFooter?: (index: number) => ReactNode;
+  /** Extra content at the bottom of the tooltip, by category id. */
+  renderTooltipFooter?: (categoryId: string) => ReactNode;
   /** Changing it remounts the bars so they replay their entrance, even for series that carry over. */
   animationKey?: string;
   'aria-labelledby'?: string;
@@ -37,9 +40,6 @@ export interface StackedBarChartProps {
 const FULL_LABEL_MIN_BAND = 76;
 
 const defaultFormat = (value: number) => value.toLocaleString('en-US');
-
-const sumOf = (values: Record<string, number | null>) =>
-  Object.values(values).reduce<number>((a, b) => a + (b ?? 0), 0);
 
 export function StackedBarChart({
   categories,
@@ -52,7 +52,7 @@ export function StackedBarChart({
   ...ariaProps
 }: StackedBarChartProps) {
   const rows = toChartRows(categories, series, totals);
-  const scale = niceScale(Math.max(0, ...rows.map((row) => Math.max(row.total ?? 0, sumOf(row.values)))));
+  const scale = niceScale(Math.max(0, ...rows.map((row) => Math.max(row.total ?? 0, row.stackSum))));
   const chartId = useId();
   const patternId = `hatch-${chartId}`;
   const missingPatternId = `missing-${chartId}`;
@@ -78,21 +78,8 @@ export function StackedBarChart({
           accessibilityLayer
         >
           <defs>
-            {hatchColor && (
-              <pattern id={patternId} width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
-                <rect width="6" height="6" style={{ fill: hatchColor }} />
-                <line x1="0" y1="0" x2="0" y2="6" className={styles.hatchLine} />
-              </pattern>
-            )}
-            <pattern
-              id={missingPatternId}
-              width="6"
-              height="6"
-              patternUnits="userSpaceOnUse"
-              patternTransform="rotate(45)"
-            >
-              <line x1="0" y1="0" x2="0" y2="6" className={styles.missingLine} />
-            </pattern>
+            {hatchColor && <HatchPattern id={patternId} lineClassName={styles.hatchLine} background={hatchColor} />}
+            <HatchPattern id={missingPatternId} lineClassName={styles.missingLine} />
           </defs>
           <CartesianGrid vertical={false} />
           <XAxis
@@ -119,13 +106,12 @@ export function StackedBarChart({
             content={({ active, payload }) => {
               const row = payload?.[0]?.payload as ChartRow | undefined;
               if (!active || !row) return null;
-              const index = rows.indexOf(row);
               return (
                 <ChartTooltip
                   row={row}
                   series={series}
                   formatValue={formatValue}
-                  footer={index >= 0 ? renderTooltipFooter?.(index) : null}
+                  footer={renderTooltipFooter?.(row.id)}
                 />
               );
             }}
@@ -153,6 +139,15 @@ export function StackedBarChart({
       </ResponsiveContainer>
       {series.length > 1 && <ChartLegend items={series} />}
     </div>
+  );
+}
+
+function HatchPattern({ id, lineClassName, background }: { id: string; lineClassName?: string; background?: string }) {
+  return (
+    <pattern id={id} width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      {background && <rect width="6" height="6" style={{ fill: background }} />}
+      <line x1="0" y1="0" x2="0" y2="6" className={lineClassName} />
+    </pattern>
   );
 }
 
@@ -222,11 +217,7 @@ function ChartTooltip({ row, series, formatValue, footer }: ChartTooltipProps) {
         {visible.map((s) => (
           <div key={s.id} className={styles.tooltipRow}>
             <dt>
-              <span
-                className={styles.swatch}
-                data-pattern={s.pattern}
-                style={{ '--swatch-color': s.color } as CSSProperties}
-              />
+              <Swatch color={s.color} pattern={s.pattern} />
               {s.name}
             </dt>
             <dd>{formatValue(row.values[s.id] ?? 0)}</dd>

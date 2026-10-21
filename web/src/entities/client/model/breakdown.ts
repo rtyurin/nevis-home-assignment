@@ -5,7 +5,6 @@ export const UNATTRIBUTED_NAME = 'Not broken down';
 export interface BreakdownSeries {
   id: string;
   name: string;
-  /** `null`: no data for that month. */
   values: readonly (number | null)[];
   /** `unattributed`: the part of the total that no child accounts for. */
   kind: 'child' | 'other' | 'unattributed';
@@ -21,7 +20,7 @@ export interface Breakdown {
   /** What the stack is split by, e.g. "branch". `null` for a leaf node. */
   dimension: string | null;
   series: BreakdownSeries[];
-  /** The node's own reported figures; the bar totals in the chart. */
+  /** The node's own reported figures. */
   totals: readonly (number | null)[];
   /** Months where the children don't add up to the node's reported total. */
   mismatches: Mismatch[];
@@ -50,9 +49,8 @@ function sumAt(nodes: readonly { values: readonly (number | null)[] }[], i: numb
 }
 
 /**
- * Splits a node's monthly totals into one series per direct child (a leaf is its own series).
- * A shortfall against the reported total becomes an `unattributed` series; shortfalls and
- * excesses are both listed in `mismatches`. Months with no reported figure never mismatch.
+ * One series per direct child (a leaf is its own series), plus an `unattributed` series for any
+ * shortfall against the reported total. Shortfalls and excesses are both listed in `mismatches`.
  */
 export function getBreakdown(node: ClientNode, { maxSeries = 5 }: BreakdownOptions = {}): Breakdown {
   const totals = node.values;

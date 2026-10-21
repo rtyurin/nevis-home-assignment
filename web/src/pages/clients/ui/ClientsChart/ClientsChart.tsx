@@ -1,21 +1,21 @@
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { useId } from 'react';
 import { clientsQueryOptions, getBreakdown, pathTo } from '@/entities/client';
-import { useDrilldown } from '../../model/drilldownStore';
-import { useSelectedNode } from '../../model/useSelectedNode';
 import { formatMonth, formatMonthShort, formatNumber } from '@/shared/lib';
 import { Breadcrumbs } from '@/shared/ui/breadcrumbs';
 import { Panel } from '@/shared/ui/panel';
 import { StackedBarChart, type ChartCategory } from '@/shared/ui/stacked-bar-chart';
 import { SERIES_COLORS, toChartSeries } from '../../lib/toChartSeries';
+import { useDrilldown } from '../../model/drilldownStore';
 import { MismatchNote } from './MismatchNote';
 import styles from './ClientsChart.module.css';
 
 /** Monthly clients for the drilled-into node, stacked by the level beneath it. */
 export function ClientsChart() {
   const { data } = useSuspenseQuery(clientsQueryOptions());
-  const node = useSelectedNode(data);
+  const selectedId = useDrilldown((state) => state.selectedId);
   const select = useDrilldown((state) => state.select);
+  const node = (selectedId !== null ? data.index.get(selectedId)?.node : undefined) ?? data.root;
   const breakdown = getBreakdown(node, { maxSeries: SERIES_COLORS.length });
   const titleId = useId();
   const descriptionId = useId();
@@ -25,7 +25,7 @@ export function ClientsChart() {
     label: formatMonth(month),
     shortLabel: formatMonthShort(month),
   }));
-  const mismatchByMonth = new Map(breakdown.mismatches.map((m) => [m.monthIndex, m]));
+  const mismatchByMonth = new Map(breakdown.mismatches.map((m) => [data.months[m.monthIndex], m]));
 
   return (
     <Panel aria-labelledby={titleId} className={styles.panel}>
@@ -48,8 +48,8 @@ export function ClientsChart() {
         totals={breakdown.totals}
         formatValue={formatNumber}
         animationKey={node.id}
-        renderTooltipFooter={(index) => {
-          const mismatch = mismatchByMonth.get(index);
+        renderTooltipFooter={(month) => {
+          const mismatch = mismatchByMonth.get(month);
           return mismatch ? `Breakdown adds up to ${formatNumber(mismatch.breakdownSum)}` : null;
         }}
       />

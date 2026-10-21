@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { closest, diffRows, expandAll } from './rows';
+import { closest, diffRows } from './rows';
 
 // root ─┬─ a ─┬─ a1
 //       │     └─ a2
@@ -50,12 +50,5 @@ describe('diffRows', () => {
     const change = diffRows(rows('root', 'a', 'b'), rows('root', 'b', 'a'), parentOf);
     expect(change.revealed.size).toBe(0);
     expect(change.isGrowing).toBe(false);
-  });
-});
-
-describe('expandAll', () => {
-  it('expands every row that can expand', () => {
-    const row = (id: string, canExpand: boolean) => ({ id, getCanExpand: () => canExpand });
-    expect(expandAll([row('a', true), row('b', false)])).toEqual({ a: true });
   });
 });

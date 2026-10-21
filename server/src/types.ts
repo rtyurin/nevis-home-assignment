@@ -1,10 +1,4 @@
-/**
- * Wire format for GET /api/clients.
- *
- * The tree is served exactly as provided in the brief (heterogeneous child keys:
- * `branches` -> `employees` -> `channels`). The envelope adds the month each
- * index in `values` refers to, so clients never have to hard-code the period.
- */
+/** Wire format for GET /api/clients: the brief's tree as given, plus the month of each `values` index. */
 export interface ChannelDto {
   id: string;
   name: string;

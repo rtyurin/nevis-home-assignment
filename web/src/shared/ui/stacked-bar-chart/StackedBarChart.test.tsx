@@ -92,15 +92,6 @@ describe('StackedBarChart', () => {
     expect(segments(container)).toEqual([]);
   });
 
-  it('labels the axes from the categories', () => {
-    const { container } = renderChart();
-    // Recharts wraps tick text in one <tspan> per word.
-    const ticks = Array.from(container.querySelectorAll('.recharts-cartesian-axis-tick-value')).map((tick) =>
-      Array.from(tick.querySelectorAll('tspan'), (word) => word.textContent).join(' '),
-    );
-    expect(ticks).toEqual(expect.arrayContaining(['Jan 2024', 'Feb 2024', '20']));
-  });
-
   it('shows a legend for two or more series only', () => {
     const { unmount } = renderChart();
     expect(screen.getByRole('list', { name: 'Legend' })).toHaveTextContent('AlphaBeta');

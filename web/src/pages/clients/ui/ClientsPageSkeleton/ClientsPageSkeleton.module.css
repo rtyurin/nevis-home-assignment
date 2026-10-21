@@ -1,3 +1,14 @@
+.stack {
+  display: grid;
+  gap: 16px;
+}
+
+.chartPanel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
 .chartHeader {
   display: flex;
   align-items: center;

@@ -33,12 +33,7 @@ export interface TreeTableProps<TData extends RowData> {
   'aria-labelledby'?: string;
 }
 
-/**
- * An expandable, window-virtualized table: the WAI-ARIA treegrid pattern in row focus mode.
- *
- * Keys: ↑/↓, PageUp/PageDown and Home/End move between rows; → expands or moves to the
- * first child; ← collapses or moves to the parent; Enter/Space toggle; * expands all siblings.
- */
+/** An expandable, window-virtualized table: the WAI-ARIA treegrid pattern in row focus mode. */
 export function TreeTable<TData extends RowData>({
   data,
   columns,

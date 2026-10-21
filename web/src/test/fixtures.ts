@@ -1,7 +1,7 @@
 import { toClientsData, type ClientsResponse } from '@/entities/client';
-import company from './clients.fixture.json';
+import company from '../../../server/src/data/clients.json';
 
-/** Same payload the API serves (copied from server/src/data/clients.json). */
+/** Same payload the API serves. */
 export const clientsResponse: ClientsResponse = {
   months: [
     '2024-02',

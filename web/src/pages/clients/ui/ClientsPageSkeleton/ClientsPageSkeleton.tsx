@@ -3,8 +3,6 @@ import { Skeleton } from '@/shared/ui/skeleton';
 import { StackedBarChartSkeleton } from '@/shared/ui/stacked-bar-chart';
 import { TreeTableSkeleton } from '@/shared/ui/tree-table';
 import { MONTH_COLUMN_META, NAME_COLUMN_META } from '../../model/columns';
-import chartStyles from '../ClientsChart/ClientsChart.module.css';
-import pageStyles from '../ClientsPage/ClientsPage.module.css';
 import styles from './ClientsPageSkeleton.module.css';
 
 /** A year of monthly totals, as shares of the axis. */
@@ -15,9 +13,9 @@ const ROW_DEPTHS = [0, 1, 1, 1];
 
 export function ClientsPageSkeleton() {
   return (
-    <div role="status" className={pageStyles.stack}>
+    <div role="status" className={styles.stack}>
       <span className="sr-only">Loading client data…</span>
-      <Panel aria-hidden="true" className={chartStyles.panel}>
+      <Panel aria-hidden="true" className={styles.chartPanel}>
         <div className={styles.chartHeader}>
           <Skeleton width={60} height={10} />
           <Skeleton width={62} height={10} />

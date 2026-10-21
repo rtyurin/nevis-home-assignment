@@ -1,24 +1,15 @@
-import type { CSSProperties } from 'react';
+import { Swatch } from './Swatch';
+import type { ChartSeries } from './types';
 import styles from './StackedBarChart.module.css';
 
-export interface ChartLegendItem {
-  id: string;
-  name: string;
-  color: string;
-  pattern?: 'hatch';
-}
+type ChartLegendItem = Pick<ChartSeries, 'id' | 'name' | 'color' | 'pattern'>;
 
 export function ChartLegend({ items }: { items: readonly ChartLegendItem[] }) {
   return (
     <ul className={styles.legend} aria-label="Legend">
       {items.map((item) => (
         <li key={item.id} className={styles.legendItem}>
-          <span
-            className={styles.swatch}
-            data-pattern={item.pattern}
-            style={{ '--swatch-color': item.color } as CSSProperties}
-            aria-hidden="true"
-          />
+          <Swatch color={item.color} pattern={item.pattern} />
           {item.name}
         </li>
       ))}

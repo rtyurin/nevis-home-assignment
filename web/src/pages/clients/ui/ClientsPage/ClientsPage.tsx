@@ -2,9 +2,9 @@ import { QueryErrorResetBoundary, useSuspenseQuery } from '@tanstack/react-query
 import { Suspense } from 'react';
 import { ErrorBoundary, type FallbackProps } from 'react-error-boundary';
 import { clientsQueryOptions } from '@/entities/client';
-import { DrilldownProvider } from '../../model/drilldownStore';
 import { ApiError } from '@/shared/api';
 import { ErrorState } from '@/shared/ui/error-state';
+import { DrilldownProvider } from '../../model/drilldownStore';
 import { ClientsChart } from '../ClientsChart/ClientsChart';
 import { ClientsTable } from '../ClientsTable/ClientsTable';
 import { ClientsPageSkeleton } from '../ClientsPageSkeleton/ClientsPageSkeleton';

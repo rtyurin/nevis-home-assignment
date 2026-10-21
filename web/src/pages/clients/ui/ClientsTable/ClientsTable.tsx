@@ -1,18 +1,15 @@
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { useId } from 'react';
 import { clientsQueryOptions } from '@/entities/client';
-import { useDrilldown } from '../../model/drilldownStore';
 import { Panel } from '@/shared/ui/panel';
 import { TreeTable } from '@/shared/ui/tree-table';
 import { clientColumns } from '../../model/columns';
+import { useDrilldown } from '../../model/drilldownStore';
 
 /** Month-by-month figures, expandable from the company down to channels. */
 export function ClientsTable() {
   const { data } = useSuspenseQuery(clientsQueryOptions());
-  const expanded = useDrilldown((state) => state.expanded);
-  const setExpanded = useDrilldown((state) => state.setExpanded);
-  const selectedId = useDrilldown((state) => state.selectedId);
-  const select = useDrilldown((state) => state.select);
+  const { expanded, setExpanded, selectedId, select } = useDrilldown((state) => state);
   const titleId = useId();
 
   return (
