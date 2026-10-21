@@ -1,6 +1,6 @@
 import { functionalUpdate, useTable, type ExpandedState, type RowData, type Updater } from '@tanstack/react-table';
 import { defaultRangeExtractor, useWindowVirtualizer } from '@tanstack/react-virtual';
-import { AnimatePresence, motion } from 'motion/react';
+import { AnimatePresence, domAnimation, LazyMotion, m } from 'motion/react';
 import { useMemo, useState } from 'react';
 import { columnLayoutStyle } from './columnLayout';
 import { treeTableFeatures, type TreeExpandedState, type TreeTableColumn } from './features';
@@ -58,8 +58,8 @@ export function TreeTable<TData extends RowData>({
     features: treeTableFeatures,
     data: data as TData[],
     columns,
-    getRowId: (item) => getRowId(item),
-    getSubRows: (item) => getSubRows(item),
+    getRowId,
+    getSubRows,
     state: { expanded },
     onExpandedChange: (updater: Updater<ExpandedState>) => {
       const next = functionalUpdate(updater, expanded);
@@ -113,50 +113,52 @@ export function TreeTable<TData extends RowData>({
   });
 
   return (
-    <div className={styles.scroller}>
-      <div
-        role="treegrid"
-        aria-rowcount={headerGroups.length + rows.length}
-        aria-colcount={leafColumns.length}
-        className={styles.grid}
-        style={columnLayoutStyle(leafColumns, rowHeight)}
-        {...handlers}
-        {...labelProps}
-      >
-        <TreeTableHeader headerGroups={headerGroups} />
-        <motion.div
-          ref={setBody}
-          role="rowgroup"
-          className={styles.body}
-          initial={false}
-          animate={{ height: rows.length * rowHeight }}
-          // Grow at once so sliding rows aren't clipped; shrink along with them.
-          transition={isGrowing ? { duration: 0 } : ROW_TRANSITION}
+    <LazyMotion features={domAnimation} strict>
+      <div className={styles.scroller}>
+        <div
+          role="treegrid"
+          aria-rowcount={headerGroups.length + rows.length}
+          aria-colcount={leafColumns.length}
+          className={styles.grid}
+          style={columnLayoutStyle(leafColumns, rowHeight)}
+          {...handlers}
+          {...labelProps}
         >
-          <AnimatePresence initial={false} custom={exitTarget}>
-            {virtualizer.getVirtualItems().map(({ index }) => {
-              const row = rows[index];
-              if (!row) return null;
-              return (
-                <TreeTableRow
-                  key={row.id}
-                  row={row}
-                  cells={row.getAllCells()}
-                  rowIndex={headerGroups.length + index + 1}
-                  setSize={(row.getParentRow()?.subRows ?? rootRows).length}
-                  y={index * rowHeight}
-                  enterFrom={enterFrom(row.id)}
-                  canExpand={row.getCanExpand()}
-                  isExpanded={row.getIsExpanded()}
-                  isTabbable={row.id === tabbableId}
-                  isSelected={onActiveRowChange ? row.id === activeRowId : undefined}
-                  isLast={index === rows.length - 1}
-                />
-              );
-            })}
-          </AnimatePresence>
-        </motion.div>
+          <TreeTableHeader headerGroups={headerGroups} />
+          <m.div
+            ref={setBody}
+            role="rowgroup"
+            className={styles.body}
+            initial={false}
+            animate={{ height: rows.length * rowHeight }}
+            // Grow at once so sliding rows aren't clipped; shrink along with them.
+            transition={isGrowing ? { duration: 0 } : ROW_TRANSITION}
+          >
+            <AnimatePresence initial={false} custom={exitTarget}>
+              {virtualizer.getVirtualItems().map(({ index }) => {
+                const row = rows[index];
+                if (!row) return null;
+                return (
+                  <TreeTableRow
+                    key={row.id}
+                    row={row}
+                    cells={row.getAllCells()}
+                    rowIndex={headerGroups.length + index + 1}
+                    setSize={(row.getParentRow()?.subRows ?? rootRows).length}
+                    y={index * rowHeight}
+                    enterFrom={enterFrom(row.id)}
+                    canExpand={row.getCanExpand()}
+                    isExpanded={row.getIsExpanded()}
+                    isTabbable={row.id === tabbableId}
+                    isSelected={onActiveRowChange ? row.id === activeRowId : undefined}
+                    isLast={index === rows.length - 1}
+                  />
+                );
+              })}
+            </AnimatePresence>
+          </m.div>
+        </div>
       </div>
-    </div>
+    </LazyMotion>
   );
 }

@@ -1,6 +1,6 @@
 import { FlexRender, type RowData } from '@tanstack/react-table';
-import { motion } from 'motion/react';
-import type { CSSProperties } from 'react';
+import { m } from 'motion/react';
+import { memo, type CSSProperties } from 'react';
 import type { TreeRow } from './features';
 import { ROW_TRANSITION, type ExitTarget } from './useRowMotion';
 import styles from './TreeTable.module.css';
@@ -21,7 +21,7 @@ interface TreeTableRowProps<TData extends RowData> {
   isLast: boolean;
 }
 
-export function TreeTableRow<TData extends RowData>({
+function TreeTableRowImpl<TData extends RowData>({
   row,
   cells,
   rowIndex,
@@ -38,7 +38,7 @@ export function TreeTableRow<TData extends RowData>({
   const [treeCell, ...otherCells] = cells;
 
   return (
-    <motion.div
+    <m.div
       role="row"
       className={styles.row}
       // Children stack under their parent, so they slide out from beneath it.
@@ -65,7 +65,7 @@ export function TreeTableRow<TData extends RowData>({
     >
       {treeCell && (
         <div role="rowheader" className={styles.treeCell} style={{ '--tree-depth': depth } as CSSProperties}>
-          <motion.span
+          <m.span
             className={styles.toggle}
             aria-hidden="true"
             initial={false}
@@ -73,7 +73,7 @@ export function TreeTableRow<TData extends RowData>({
             transition={ROW_TRANSITION}
           >
             {canExpand && <Chevron />}
-          </motion.span>
+          </m.span>
           <FlexRender cell={treeCell} />
         </div>
       )}
@@ -87,9 +87,12 @@ export function TreeTableRow<TData extends RowData>({
           <FlexRender cell={cell} />
         </div>
       ))}
-    </motion.div>
+    </m.div>
   );
 }
+
+/** Memoized: the virtualizer re-renders the table on every scroll, but a row's props rarely change. */
+export const TreeTableRow = memo(TreeTableRowImpl) as typeof TreeTableRowImpl;
 
 function Chevron() {
   return (
