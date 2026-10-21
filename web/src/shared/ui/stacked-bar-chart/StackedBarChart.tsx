@@ -36,7 +36,9 @@ const FULL_LABEL_MIN_BAND = 76;
 
 const defaultFormat = (value: number) => value.toLocaleString('en-US');
 
-/** Stacked bar chart over categories (months), built on Recharts. */
+const sumOf = (values: Record<string, number | null>) =>
+  Object.values(values).reduce<number>((a, b) => a + (b ?? 0), 0);
+
 export function StackedBarChart({
   categories,
   series,
@@ -48,7 +50,7 @@ export function StackedBarChart({
 }: StackedBarChartProps) {
   const rows = toChartRows(categories, series, totals);
   const scale = niceScale(Math.max(0, ...rows.map((row) => Math.max(row.total ?? 0, sumOf(row.values)))));
-  const chartId = useId().replace(/:/g, '');
+  const chartId = useId();
   const patternId = `hatch-${chartId}`;
   const missingPatternId = `missing-${chartId}`;
   const reduceMotion = useReducedMotion() ?? false;
@@ -91,8 +93,7 @@ export function StackedBarChart({
           </defs>
           <CartesianGrid vertical={false} />
           <XAxis
-            // Short labels when narrow. (Not via tickFormatter's index: once ticks are thinned
-            // out, that index counts visible ticks, not categories.)
+            // Not via tickFormatter: once ticks thin out, its index counts visible ticks, not categories.
             dataKey={narrow ? 'shortLabel' : 'label'}
             height={X_AXIS_HEIGHT}
             tickLine={false}
@@ -107,7 +108,7 @@ export function StackedBarChart({
             axisLine={false}
             domain={[0, scale.max]}
             ticks={scale.ticks}
-            tickFormatter={(value: number) => formatValue(value)}
+            tickFormatter={formatValue}
           />
           <Tooltip
             cursor={{ className: styles.cursor }}
@@ -151,9 +152,6 @@ export function StackedBarChart({
     </div>
   );
 }
-
-const sumOf = (values: Record<string, number | null>) =>
-  Object.values(values).reduce<number>((a, b) => a + (b ?? 0), 0);
 
 interface SegmentProps extends BarShapeProps {
   seriesId: string;
@@ -212,7 +210,7 @@ function ChartTooltip({ row, series, formatValue, footer }: ChartTooltipProps) {
       </div>
     );
   }
-  // Top of the stack first, matching what the eye sees.
+  // Top of the stack first, as drawn.
   const visible = series.filter((s) => (row.values[s.id] ?? 0) > 0).reverse();
   return (
     <div className={styles.tooltip}>
