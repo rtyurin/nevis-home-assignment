@@ -6,7 +6,7 @@ import { MONTH_COLUMN_META, NAME_COLUMN_META } from '../../model/columns';
 import styles from './ClientsPageSkeleton.module.css';
 
 /** A year of monthly totals, as shares of the axis. */
-const BARS = [0.62, 0.67, 0.71, 0.75, 0.79, 0.84, 0.88, 0.62, 0.62, 0.62, 0.62, 0.88];
+const BARS = [0.73, 0.67, 0.5, 0.73, 0.79, 0.84, 0.88, 0.62, 0.62, 0.62, 0.62, 0.88];
 const COLUMNS = [NAME_COLUMN_META, ...BARS.map(() => MONTH_COLUMN_META)];
 /** The company, expanded to its branches. */
 const ROW_DEPTHS = [0, 1, 1, 1];
