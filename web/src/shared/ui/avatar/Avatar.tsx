@@ -4,7 +4,9 @@ const TONES = 4;
 
 function initials(name: string): string {
   const parts = name.trim().split(/\s+/);
-  return ((parts[0]?.[0] ?? '') + (parts.length > 1 ? (parts[parts.length - 1]?.[0] ?? '') : '')).toUpperCase();
+  const first = parts[0]?.[0] ?? '';
+  const last = parts.length > 1 ? (parts.at(-1)?.[0] ?? '') : '';
+  return (first + last).toUpperCase();
 }
 
 function toneFor(name: string): number {

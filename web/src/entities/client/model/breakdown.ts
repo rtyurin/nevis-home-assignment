@@ -6,7 +6,7 @@ export interface BreakdownSeries {
   id: string;
   name: string;
   /** `null`: no data for that month. */
-  values: (number | null)[];
+  values: readonly (number | null)[];
   /** `unattributed`: the part of the total that no child accounts for. */
   kind: 'child' | 'other' | 'unattributed';
 }
@@ -50,14 +50,9 @@ function sumAt(nodes: readonly { values: readonly (number | null)[] }[], i: numb
 }
 
 /**
- * Splits a node's monthly totals by the level beneath it: one series per direct
- * child. A leaf node is a single series of its own values.
- *
- * The children don't always add up to the node's reported total. Where they fall
- * short, the remainder becomes an `unattributed` series so the stack still reaches
- * the reported figure. Where they exceed it, the series are left as they are.
- * Both cases are listed in `mismatches`. A month with no reported figure has
- * nothing to reconcile against, so it is never a mismatch.
+ * Splits a node's monthly totals into one series per direct child (a leaf is its own series).
+ * A shortfall against the reported total becomes an `unattributed` series; shortfalls and
+ * excesses are both listed in `mismatches`. Months with no reported figure never mismatch.
  */
 export function getBreakdown(node: ClientNode, { maxSeries = 5 }: BreakdownOptions = {}): Breakdown {
   const totals = node.values;
@@ -65,7 +60,7 @@ export function getBreakdown(node: ClientNode, { maxSeries = 5 }: BreakdownOptio
   if (node.children.length === 0) {
     return {
       dimension: null,
-      series: [{ id: node.id, name: node.name, values: [...node.values], kind: 'child' }],
+      series: [{ id: node.id, name: node.name, values: node.values, kind: 'child' }],
       totals,
       mismatches: [],
     };
@@ -98,7 +93,7 @@ function foldIntoOther(node: ClientNode, maxSeries: number): BreakdownSeries[] {
   const children: BreakdownSeries[] = node.children.map(({ id, name, values }) => ({
     id,
     name,
-    values: [...values],
+    values,
     kind: 'child',
   }));
   if (children.length <= maxSeries) return children;

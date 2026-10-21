@@ -15,8 +15,8 @@ export function pathTo(index: ClientIndex, id: string): ClientNode[] {
   const path: ClientNode[] = [];
   let entry = index.get(id);
   while (entry) {
-    path.unshift(entry.node);
+    path.push(entry.node);
     entry = entry.parentId === null ? undefined : index.get(entry.parentId);
   }
-  return path;
+  return path.reverse();
 }
