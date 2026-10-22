@@ -8,6 +8,11 @@ export default defineConfig([
     files: ['./src/entities/**'],
     rules: { 'fsd/insignificant-slice': 'off' },
   },
+  {
+    // The chart and table are built to be placed on more than one page; only one exists so far.
+    files: ['./src/widgets/**'],
+    rules: { 'fsd/insignificant-slice': 'off' },
+  },
   // Test harness (setup, fixtures, render helpers) sits outside the layers on purpose.
   { ignores: ['**/test/**'] },
 ]);

@@ -36,7 +36,7 @@ React 19, TypeScript, Vite and CSS Modules on the web; Express 5 on the server.
 - **Zod:** validates the API response at the boundary.
 - **Vitest, Testing Library, Supertest:** UI tests through roles and the keyboard, and API tests.
 
-`web/` follows [Feature-Sliced Design](https://feature-sliced.design) (`app` → `pages` → `entities` → `shared`),
+`web/` follows [Feature-Sliced Design](https://feature-sliced.design) (`app` → `pages` → `widgets` → `entities` → `shared`),
 enforced by [Steiger](https://github.com/feature-sliced/steiger). The components in `shared/ui` (`TreeTable`,
 `StackedBarChart`, …) are controlled and know nothing about clients.
 

@@ -4,9 +4,9 @@ import { ErrorBoundary, type FallbackProps } from 'react-error-boundary';
 import { clientsQueryOptions } from '@/entities/client';
 import { ApiError } from '@/shared/api';
 import { ErrorState } from '@/shared/ui/error-state';
+import { ClientsChart } from '@/widgets/clients-chart';
+import { ClientsTable } from '@/widgets/clients-table';
 import { DrilldownProvider, useDrilldown } from '../../model/drilldownStore';
-import { ClientsChart } from '../ClientsChart/ClientsChart';
-import { ClientsTable } from '../ClientsTable/ClientsTable';
 import { ClientsPageSkeleton } from '../ClientsPageSkeleton/ClientsPageSkeleton';
 import styles from './ClientsPage.module.css';
 
@@ -38,7 +38,7 @@ function ClientsDashboard() {
 
 /** Each panel fails on its own: a chart that can't be drawn leaves the table usable, and the other way round. */
 function ClientsPanels() {
-  const selectedId = useDrilldown((state) => state.selectedId);
+  const { expanded, setExpanded, selectedId, select } = useDrilldown((state) => state);
   return (
     <div className={styles.stack}>
       {/* Selecting another row is a fresh attempt at drawing the chart. */}
@@ -52,7 +52,7 @@ function ClientsPanels() {
           />
         )}
       >
-        <ClientsChart />
+        <ClientsChart selectedId={selectedId} onSelect={select} />
       </ErrorBoundary>
       <ErrorBoundary
         fallbackRender={({ resetErrorBoundary }) => (
@@ -63,7 +63,7 @@ function ClientsPanels() {
           />
         )}
       >
-        <ClientsTable />
+        <ClientsTable expanded={expanded} onExpandedChange={setExpanded} selectedId={selectedId} onSelect={select} />
       </ErrorBoundary>
     </div>
   );

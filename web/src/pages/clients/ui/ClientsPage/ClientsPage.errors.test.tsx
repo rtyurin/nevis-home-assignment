@@ -8,7 +8,8 @@ import { ClientsPage } from './ClientsPage';
 
 const chart = vi.hoisted(() => ({ fails: true }));
 
-vi.mock('../ClientsChart/ClientsChart', () => ({
+vi.mock('@/widgets/clients-chart', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/widgets/clients-chart')>()),
   ClientsChart: () => {
     if (chart.fails) throw new Error('Chart crashed');
     return <p>Chart drawn</p>;

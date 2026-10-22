@@ -2,14 +2,19 @@ import { useSuspenseQuery } from '@tanstack/react-query';
 import { useId } from 'react';
 import { clientsQueryOptions } from '@/entities/client';
 import { Panel } from '@/shared/ui/panel';
-import { TreeTable } from '@/shared/ui/tree-table';
-import { clientColumns } from '../../model/columns';
-import { useDrilldown } from '../../model/drilldownStore';
+import { TreeTable, type TreeExpandedState } from '@/shared/ui/tree-table';
+import { clientColumns } from '../model/columns';
+
+export interface ClientsTableProps {
+  expanded: TreeExpandedState;
+  onExpandedChange: (expanded: TreeExpandedState) => void;
+  selectedId: string | null;
+  onSelect: (id: string) => void;
+}
 
 /** Month-by-month figures, expandable from the company down to channels. */
-export function ClientsTable() {
+export function ClientsTable({ expanded, onExpandedChange, selectedId, onSelect }: ClientsTableProps) {
   const { data } = useSuspenseQuery(clientsQueryOptions());
-  const { expanded, setExpanded, selectedId, select } = useDrilldown((state) => state);
   const titleId = useId();
 
   return (
@@ -24,9 +29,9 @@ export function ClientsTable() {
         getRowId={(node) => node.id}
         getSubRows={(node) => node.children}
         expanded={expanded}
-        onExpandedChange={setExpanded}
+        onExpandedChange={onExpandedChange}
         activeRowId={selectedId}
-        onActiveRowChange={select}
+        onActiveRowChange={onSelect}
       />
     </Panel>
   );

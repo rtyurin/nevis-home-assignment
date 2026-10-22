@@ -5,16 +5,20 @@ import { formatMonth, formatMonthShort, formatNumber } from '@/shared/lib';
 import { Breadcrumbs } from '@/shared/ui/breadcrumbs';
 import { Panel } from '@/shared/ui/panel';
 import { StackedBarChart, type ChartCategory } from '@/shared/ui/stacked-bar-chart';
-import { SERIES_COLORS, toChartSeries } from '../../lib/toChartSeries';
-import { useDrilldown } from '../../model/drilldownStore';
+import { SERIES_COLORS, toChartSeries } from '../lib/toChartSeries';
 import { MismatchSummary } from './MismatchSummary';
 import styles from './ClientsChart.module.css';
 
+export interface ClientsChartProps {
+  /** The node to chart; the company when null. */
+  selectedId: string | null;
+  /** From the breadcrumbs. */
+  onSelect: (id: string) => void;
+}
+
 /** Monthly clients for the drilled-into node, stacked by the level beneath it. */
-export function ClientsChart() {
+export function ClientsChart({ selectedId, onSelect }: ClientsChartProps) {
   const { data } = useSuspenseQuery(clientsQueryOptions());
-  const selectedId = useDrilldown((state) => state.selectedId);
-  const select = useDrilldown((state) => state.select);
   const node = (selectedId !== null ? data.index.get(selectedId)?.node : undefined) ?? data.root;
   const breakdown = getBreakdown(node, { maxSeries: SERIES_COLORS.length });
   const titleId = useId();
@@ -33,7 +37,7 @@ export function ClientsChart() {
         {`${node.name} clients${breakdown.dimension ? ` by ${breakdown.dimension}` : ''}`}
       </h2>
       <div className={styles.header}>
-        <Breadcrumbs aria-label="Chart scope" items={pathTo(data.index, node.id)} onSelect={select} />
+        <Breadcrumbs aria-label="Chart scope" items={pathTo(data.index, node.id)} onSelect={onSelect} />
         {breakdown.dimension && <span className={styles.dimension}>by {breakdown.dimension}</span>}
         <MismatchSummary
           key={node.id}
