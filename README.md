@@ -77,14 +77,15 @@ Other ways to do it:
 
 While checking the totals I found a few things that look off.
 
-Maria Gutierrez has 22 clients in May, which doesn't fit the rest of her series (36, 39, 41, then 22, then 46). The
-company's May total is short by exactly 22. If her May were 44, her series, Branch 1 and the company would all line
-up, so I suspect a typo in her figure.
+Maria Gutierrez has 22 clients in May, which doesn't fit her series (36, 39, 41, then 22, then 46). Branch 1's May
+(156) also dips against its trend, and the company's May is 22 more than its branches add up to. If both Maria's and
+Branch 1's May were 22 higher (44 and 178), everything would line up, so I suspect the same typo carried into both
+figures.
 
 Robert Chen's August is 58 in the data but 56 in the design, and 56 is the number that makes Branch 1 add up.
 
 Anna's "New paid" row looks like it's one month late. Moving it back a month fixes all five of her months that don't
-add up.
+add up, though it leaves March and December off by one, so it's a likely explanation rather than a certain one.
 
 The design shows 291 for Branch 1 in July, but the data says 201. 201 fits the trend, so I think the design has a
 typo.
